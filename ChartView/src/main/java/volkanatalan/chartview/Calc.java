@@ -1,5 +1,9 @@
 package volkanatalan.chartview;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.util.TypedValue;
+
 import java.util.ArrayList;
 
 public class Calc {
@@ -67,5 +71,15 @@ public class Calc {
     String resultString = "";
     for (String ch : valueChars) resultString += ch;
     return Double.valueOf(resultString);
+  }
+  
+  public static double degreeToRadian(double degree) {
+    double pi = Math.PI;
+    return pi / 180 * degree;
+  }
+  
+  int dp(Context context, int px) {
+    Resources r = context.getResources();
+    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, px, r.getDisplayMetrics());
   }
 }

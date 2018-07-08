@@ -1,12 +1,13 @@
-package volkanatalan.chartview.value_views;
+package volkanatalan.chartview.data_views;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.os.Vibrator;
+import android.graphics.Typeface;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,7 +20,7 @@ import volkanatalan.chartview.datas.PieChartData;
 
 import java.util.ArrayList;
 
-public class PieChartValueView extends LinearLayout {
+public class PieChartDataView extends LinearLayout {
   LinearLayout root = this;
   private Context context;
   private int textColor = Color.BLACK;
@@ -27,39 +28,31 @@ public class PieChartValueView extends LinearLayout {
   private int colorBoxDimension = 10;
   private int colorBoxMarginEnd = 20;
   private int padding = -1;
-  private int paddingStart = 0;
-  private int paddingEnd = 0;
-  private int paddingLeft = 0;
-  private int paddingTop = 0;
-  private int paddingRight = 0;
-  private int paddingBottom = 0;
-  private int horizontalLLMarginLeft = 0;
-  private int horizontalLLMarginTop = 0;
-  private int horizontalLLMarginRight = 0;
-  private int horizontalLLMarginBottom = 10;
-  private ArrayList<PieChartData> pieChartValues;
+  private int paddingStart, paddingEnd, paddingLeft, paddingTop, paddingRight, paddingBottom;
+  private int margin, marginLeft, marginTop, marginRight, marginBottom;
+  private int selectedSegment = 0;
   private int[] colorList = getContext().getResources().getIntArray(R.array.pie_chart_color_list);
+  private ArrayList<PieChartData> pieChartValues;
   private LinearLayout horizontalLL;
   private LinearLayout colorBox;
   private TextView labelTV;
   private AttributeSet attrs;
   private PieChartView pieChartView;
-  private Vibrator vibrator;
   
-  public PieChartValueView(Context context) {
+  public PieChartDataView(Context context) {
     super(context);
     this.context = context;
     start();
   }
   
-  public PieChartValueView(Context context, @Nullable AttributeSet attrs) {
+  public PieChartDataView(Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
     this.context = context;
     this.attrs = attrs;
     start();
   }
   
-  public PieChartValueView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+  public PieChartDataView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
     this.context = context;
     this.attrs = attrs;
@@ -98,7 +91,6 @@ public class PieChartValueView extends LinearLayout {
               if (coordY > root.getChildAt(i).getTop() && coordY < root.getChildAt(i).getBottom()) {
                 pieChartView.setSelectedSegment(i);
                 pieChartView.invalidate();
-                vibrator.vibrate(500);
               }
             }
             break;
@@ -107,12 +99,11 @@ public class PieChartValueView extends LinearLayout {
       }
     };
     setOnTouchListener(onTouchListener);
-  
-    vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
   }
   
   @SuppressLint("ClickableViewAccessibility")
   public void draw() {
+    removeAllViews();
     LayoutParams colorBoxParams = new LayoutParams(colorBoxDimension, colorBoxDimension);
     colorBoxParams.setMarginEnd(colorBoxMarginEnd);
   
@@ -120,6 +111,12 @@ public class PieChartValueView extends LinearLayout {
       horizontalLL = new LinearLayout(context);
       colorBox = new LinearLayout(context);
       labelTV = new TextView(context);
+  
+      Log.e("selectedSegment", selectedSegment + "");
+      if (i == selectedSegment)
+        labelTV.setTypeface(Typeface.DEFAULT_BOLD);
+      else
+        labelTV.setTypeface(Typeface.DEFAULT);
     
       this.setOrientation(VERTICAL);
       this.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
@@ -131,7 +128,7 @@ public class PieChartValueView extends LinearLayout {
         horizontalLLParams.setMargins(0, 0, 0, 0);
       } else {
         horizontalLLParams.setMargins(
-            horizontalLLMarginLeft, horizontalLLMarginTop, horizontalLLMarginRight, horizontalLLMarginBottom);
+            marginLeft, marginTop, marginRight, marginBottom);
       }
     
       horizontalLL.setLayoutParams(horizontalLLParams);
@@ -153,6 +150,14 @@ public class PieChartValueView extends LinearLayout {
   
   public void bindTo(PieChartView pieChartView) {
     this.pieChartView = pieChartView;
+  
+    this.pieChartView.setSelectedSegmentChangeListener(new PieChartView.SelectedSegmentChangeListener() {
+      @Override
+      public void onChange(int position) {
+        selectedSegment = position;
+        draw();
+      }
+    });
   }
   
   public void setData(ArrayList<PieChartData> pieChartValues) {
@@ -235,35 +240,35 @@ public class PieChartValueView extends LinearLayout {
     this.paddingBottom = paddingBottom;
   }
   
-  public int getHorizontalLLMarginLeft() {
-    return horizontalLLMarginLeft;
+  public int getMarginLeft() {
+    return marginLeft;
   }
   
-  public void setHorizontalLLMarginLeft(int horizontalLLMarginLeft) {
-    this.horizontalLLMarginLeft = horizontalLLMarginLeft;
+  public void setMarginLeft(int marginLeft) {
+    this.marginLeft = marginLeft;
   }
   
-  public int getHorizontalLLMarginTop() {
-    return horizontalLLMarginTop;
+  public int getMarginTop() {
+    return marginTop;
   }
   
-  public void setHorizontalLLMarginTop(int horizontalLLMarginTop) {
-    this.horizontalLLMarginTop = horizontalLLMarginTop;
+  public void setMarginTop(int marginTop) {
+    this.marginTop = marginTop;
   }
   
-  public int getHorizontalLLMarginRight() {
-    return horizontalLLMarginRight;
+  public int getMarginRight() {
+    return marginRight;
   }
   
-  public void setHorizontalLLMarginRight(int horizontalLLMarginRight) {
-    this.horizontalLLMarginRight = horizontalLLMarginRight;
+  public void setMarginRight(int marginRight) {
+    this.marginRight = marginRight;
   }
   
-  public int getHorizontalLLMarginBottom() {
-    return horizontalLLMarginBottom;
+  public int getMarginBottom() {
+    return marginBottom;
   }
   
-  public void setHorizontalLLMarginBottom(int horizontalLLMarginBottom) {
-    this.horizontalLLMarginBottom = horizontalLLMarginBottom;
+  public void setMarginBottom(int marginBottom) {
+    this.marginBottom = marginBottom;
   }
 }

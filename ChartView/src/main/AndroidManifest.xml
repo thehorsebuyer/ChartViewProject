@@ -1,5 +1,3 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="volkanatalan.chartview" >
-
-    <uses-permission android:name="android.permission.VIBRATE" />
 </manifest>

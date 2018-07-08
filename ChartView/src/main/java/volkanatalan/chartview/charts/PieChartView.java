@@ -25,7 +25,7 @@ public class PieChartView extends View {
   private int textSize = 30;
   private int apartDistance = 10;
   private int selectedSegment = 0;
-  private int textColor = Color.WHITE;
+  private int textColor = Color.BLACK;
   private int middleCircleColor = Color.WHITE;
   private float radius, xCenter, yCenter;
   private float startAngle = 270;
@@ -34,6 +34,7 @@ public class PieChartView extends View {
   private ArrayList<PieChartData> data;
   private LockableScrollView lockableScrollView;
   private int[] colorList = getContext().getResources().getIntArray(R.array.pie_chart_color_list);
+  private SelectedSegmentChangeListener selectedSegmentChangeListener;
   
   public PieChartView(Context context) {
     super(context);
@@ -48,6 +49,10 @@ public class PieChartView extends View {
   public PieChartView(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
     start();
+  }
+  
+  public interface SelectedSegmentChangeListener {
+    void onChange(int position);
   }
   
   @SuppressLint("ClickableViewAccessibility")
@@ -90,7 +95,7 @@ public class PieChartView extends View {
                       (data.get(i).getStartAngleRadian() < touchAngle + 2 * Math.PI &&
                            data.get(i).getSweepAngleRadian() > touchAngle + 2 * Math.PI))
               {
-                selectedSegment = i;
+                setSelectedSegment(i);
                 invalidate();
               }
             }
@@ -104,7 +109,7 @@ public class PieChartView extends View {
                     (data.get(i).getStartAngleRadian() < touchAngle + 2 * Math.PI &&
                          data.get(i).getSweepAngleRadian() > touchAngle + 2 * Math.PI))
             {
-              selectedSegment = i;
+              setSelectedSegment(i);
               invalidate();
             }
           }
@@ -141,17 +146,17 @@ public class PieChartView extends View {
         for (int i = 0; i < data.size(); i++) {
           startAngle = startAngle % 360;
           double degree = data.get(i).getValue() / devisor360;
+          float drawingDegree = (float) degree;
           double percentage = data.get(i).getValue() / devisor100;
-          double drawingDegree = i < data.size() - 1 ? degree + 1 : degree;
-          double startAngleRadian = convertDegreeToRadian(startAngle);
-          double middleAngleRadian = convertDegreeToRadian(startAngle + degree / 2);
-          double sweepAngleRadian = convertDegreeToRadian(startAngle + degree);
+          double startAngleRadian = Calc.degreeToRadian(startAngle);
+          double middleAngleRadian = Calc.degreeToRadian(startAngle + degree / 2);
+          double sweepAngleRadian = Calc.degreeToRadian(startAngle + degree);
   
           data.get(i).setStartAngle(startAngle);
           data.get(i).setStartAngleRadian(startAngleRadian);
           data.get(i).setDegree(degree);
           data.get(i).setPercentage(percentage);
-          data.get(i).setDrawingDegree((float) drawingDegree);
+          data.get(i).setDrawingDegree(drawingDegree);
           data.get(i).setMiddleAngleRadian(middleAngleRadian);
           data.get(i).setSweepAngleRadian(sweepAngleRadian);
           startAngle += degree;
@@ -228,16 +233,6 @@ public class PieChartView extends View {
     }
   }
   
-  private double convertDegreeToRadian(double degree) {
-    double pi = Math.PI;
-    return pi / 180 * degree;
-  }
-  
-  int dp(int px) {
-    Resources r = getResources();
-    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, px, r.getDisplayMetrics());
-  }
-  
   public void draw() {
     invalidate();
   }
@@ -304,9 +299,18 @@ public class PieChartView extends View {
   
   public void setSelectedSegment(int selectedSegment) {
     this.selectedSegment = selectedSegment;
+    if (selectedSegmentChangeListener != null) selectedSegmentChangeListener.onChange(selectedSegment);
   }
   
   public void setLockableScrollView(LockableScrollView lockableScrollView) {
     this.lockableScrollView = lockableScrollView;
+  }
+  
+  public SelectedSegmentChangeListener getSelectedSegmentChangeListener() {
+    return selectedSegmentChangeListener;
+  }
+  
+  public void setSelectedSegmentChangeListener(SelectedSegmentChangeListener listener) {
+    this.selectedSegmentChangeListener = listener;
   }
 }

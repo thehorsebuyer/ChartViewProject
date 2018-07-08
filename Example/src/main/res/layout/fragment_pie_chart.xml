@@ -20,7 +20,7 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <volkanatalan.chartview.value_views.PieChartValueView
+        <volkanatalan.chartview.data_views.PieChartDataView
             android:id="@+id/pieChartValueView"
             android:layout_width="300dp"
             android:layout_height="0dp"

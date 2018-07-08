@@ -11,13 +11,13 @@ import android.widget.FrameLayout;
 import java.util.ArrayList;
 
 import volkanatalan.chartview.charts.PieChartView;
+import volkanatalan.chartview.data_views.PieChartDataView;
 import volkanatalan.chartview.datas.PieChartData;
-import volkanatalan.chartview.value_views.PieChartValueView;
 import volkanatalan.chartviewproject.R;
 
 public class PieChart extends Fragment {
   PieChartView pieChartView;
-  PieChartValueView pieChartValueView;
+  PieChartDataView pieChartDataView;
   ArrayList<PieChartData> pieChartData;
   
   public PieChart() {
@@ -34,14 +34,14 @@ public class PieChart extends Fragment {
     View v = inflater.inflate(R.layout.fragment_pie_chart, container, false);
     FrameLayout root = v.findViewById(R.id.root);
     pieChartView = v.findViewById(R.id.pieChartView);
-    pieChartValueView = v.findViewById(R.id.pieChartValueView);
+    pieChartDataView = v.findViewById(R.id.pieChartValueView);
   
     pieChartView.setData(pieChartData);
     pieChartView.draw(); // or pieChartView.invalidate();
   
-    pieChartValueView.setData(pieChartData);
-    pieChartValueView.bindTo(pieChartView);
-    pieChartValueView.draw(); // or pieChartValueView.invalidate();
+    pieChartDataView.setData(pieChartData);
+    pieChartDataView.bindTo(pieChartView);
+    pieChartDataView.draw(); // or pieChartValueView.invalidate();
     
     root.setOnClickListener(new View.OnClickListener() {
       @Override
