@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="red">#f00</color>
+    <color name="orange">#ff6d00</color>
+    <color name="yellow">#ff0</color>
+    <color name="green">#0f0</color>
+    <color name="blue">#00f</color>
+    <color name="purple">#7c19b9</color>
+    <color name="magenta">#f0f</color>
+    <color name="pink">#ff69b4</color>
+    <color name="cyan">#0ff</color>
+    <color name="gray">#d3d3d3 </color>
+    <color name="white">#fff </color>
+    <color name="white_a50">#32ffffff</color>
+    <color name="black_a70">#46232323</color>
+
+    <array name="pie_chart_color_list">
+        <item>@color/red</item>
+        <item>@color/orange</item>
+        <item>@color/yellow</item>
+        <item>@color/green</item>
+        <item>@color/blue</item>
+        <item>@color/purple</item>
+        <item>@color/magenta</item>
+        <item>@color/pink</item>
+        <item>@color/cyan</item>
+        <item>@color/gray</item>
+
+    </array>
+</resources>

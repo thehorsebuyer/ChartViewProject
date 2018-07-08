@@ -1,4 +1,4 @@
-package net.cafepp.chartview;
+package volkanatalan.chartview;
 
 import org.junit.Test;
 

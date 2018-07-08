@@ -9,6 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/ChartView" />
+            <option value="$PROJECT_DIR$/ChartView2" />
             <option value="$PROJECT_DIR$/Example" />
           </set>
         </option>
