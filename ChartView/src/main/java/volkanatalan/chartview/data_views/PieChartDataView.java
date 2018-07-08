@@ -3,11 +3,13 @@ package volkanatalan.chartview.data_views;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.ShapeDrawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -34,10 +36,13 @@ public class PieChartDataView extends LinearLayout {
   private int[] colorList = getContext().getResources().getIntArray(R.array.pie_chart_color_list);
   private ArrayList<PieChartData> pieChartValues;
   private LinearLayout horizontalLL;
-  private LinearLayout colorBox;
+  private View colorBox;
   private TextView labelTV;
   private AttributeSet attrs;
   private PieChartView pieChartView;
+  public enum ColorBoxShape {RECT, CIRCLE}
+  private ColorBoxShape colorBoxShape = ColorBoxShape.CIRCLE;
+  
   
   public PieChartDataView(Context context) {
     super(context);
@@ -107,16 +112,39 @@ public class PieChartDataView extends LinearLayout {
     LayoutParams colorBoxParams = new LayoutParams(colorBoxDimension, colorBoxDimension);
     colorBoxParams.setMarginEnd(colorBoxMarginEnd);
   
-    for (int i = 0; i < pieChartValues.size(); i++) {
-      horizontalLL = new LinearLayout(context);
-      colorBox = new LinearLayout(context);
-      labelTV = new TextView(context);
+    final Paint colorBoxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    colorBoxPaint.setDither(true);
   
-      Log.e("selectedSegment", selectedSegment + "");
+    for (int i = 0; i < pieChartValues.size(); i++) {
+      
+      horizontalLL = new LinearLayout(context);
+      labelTV = new TextView(context);
+      final int pos = i;
+      colorBox = new View(context){
+        @Override
+        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+          setMeasuredDimension(colorBoxDimension, colorBoxDimension);
+        }
+  
+        @Override
+        protected void onDraw(Canvas canvas) {
+          super.onDraw(canvas);
+          colorBoxPaint.setColor(colorList[pos]);
+          
+          if (colorBoxShape == ColorBoxShape.CIRCLE) {
+            canvas.drawCircle(canvas.getWidth() / 2, canvas.getHeight() / 2,
+                canvas.getHeight() / 2, colorBoxPaint);
+          } else {
+            canvas.drawPaint(colorBoxPaint);
+          }
+        }
+      };
+  
       if (i == selectedSegment)
         labelTV.setTypeface(Typeface.DEFAULT_BOLD);
       else
         labelTV.setTypeface(Typeface.DEFAULT);
+      labelTV.setPadding(10, 0, 0, 0);
     
       this.setOrientation(VERTICAL);
       this.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
@@ -135,12 +163,11 @@ public class PieChartDataView extends LinearLayout {
       horizontalLL.setOrientation(HORIZONTAL);
       horizontalLL.setGravity(Gravity.CENTER_VERTICAL);
     
-      colorBox.setLayoutParams(colorBoxParams);
+      //colorBox.setLayoutParams(colorBoxParams);
     
       labelTV.setTextColor(Color.BLACK);
       labelTV.setTextSize(30);
     
-      colorBox.setBackgroundColor(colorList[i]);
       labelTV.setText(pieChartValues.get(i).getTitle() + " (" + pieChartValues.get(i).getValue() + ")");
       horizontalLL.addView(colorBox);
       horizontalLL.addView(labelTV);
@@ -186,6 +213,10 @@ public class PieChartDataView extends LinearLayout {
   
   public void setColorList(int[] colorList) {
     this.colorList = colorList;
+  }
+  
+  public void setColorBoxShape(ColorBoxShape shape) {
+    this.colorBoxShape = shape;
   }
   
   public int getColorBoxDimension() {

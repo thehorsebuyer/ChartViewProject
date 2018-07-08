@@ -35,12 +35,13 @@ public class PieChart extends Fragment {
     FrameLayout root = v.findViewById(R.id.root);
     pieChartView = v.findViewById(R.id.pieChartView);
     pieChartDataView = v.findViewById(R.id.pieChartValueView);
-  
+    
     pieChartView.setData(pieChartData);
     pieChartView.draw(); // or pieChartView.invalidate();
-  
+    
     pieChartDataView.setData(pieChartData);
     pieChartDataView.bindTo(pieChartView);
+    pieChartDataView.setColorBoxDimension(13);
     pieChartDataView.draw(); // or pieChartValueView.invalidate();
     
     root.setOnClickListener(new View.OnClickListener() {

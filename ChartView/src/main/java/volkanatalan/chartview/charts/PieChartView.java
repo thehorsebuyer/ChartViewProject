@@ -57,7 +57,6 @@ public class PieChartView extends View {
   
   @SuppressLint("ClickableViewAccessibility")
   private void start() {
-  
     paintSegment = new Paint(Paint.ANTI_ALIAS_FLAG);
     paintSegment.setStyle(Paint.Style.FILL);
     paintSegment.setDither(true);
@@ -128,7 +127,7 @@ public class PieChartView extends View {
   @Override
   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
-    setMeasuredDimension(Math.round(w), Math.round(h));
+    setMeasuredDimension(w, h);
     
     radius = Math.min(w, h) / 2;
     xCenter = w / 2;
