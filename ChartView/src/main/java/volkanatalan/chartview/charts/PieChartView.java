@@ -2,14 +2,11 @@ package volkanatalan.chartview.charts;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -31,7 +28,7 @@ public class PieChartView extends View {
   private float radius, xCenter, yCenter;
   private float startAngle = 270;
   private Paint paintSegment, paintText, paintMiddleCircle, paintBackground;
-  private RectF arcRect;
+  private RectF selectedArcRect, unselectedArcRect;
   private ArrayList<PieChartData> data;
   private LockableScrollView lockableScrollView;
   private int[] colorList = getContext().getResources().getIntArray(R.array.pie_chart_color_list);
@@ -75,7 +72,9 @@ public class PieChartView extends View {
     paintBackground.setDither(true);
     paintBackground.setColor(Color.GRAY);
     
-    arcRect = new RectF();
+    selectedArcRect = new RectF();
+    
+    unselectedArcRect = new RectF();
   
     OnTouchListener onTouchListener = new OnTouchListener() {
       @Override
@@ -188,6 +187,11 @@ public class PieChartView extends View {
         }
       }
     }
+  
+    unselectedArcRect.left = xCenter - radius + apartDistance;
+    unselectedArcRect.top = yCenter - radius + apartDistance;
+    unselectedArcRect.right = xCenter + radius - apartDistance;
+    unselectedArcRect.bottom = yCenter + radius - apartDistance;
   }
   
   @Override
@@ -208,12 +212,12 @@ public class PieChartView extends View {
         
         // Draw selected circle segment
         double middleAng = data.get(selectedSegment).getMiddleAngleRadian();
-        arcRect.left = xCenter - radius + apartDistance + (float) Math.cos(middleAng) * apartDistance;
-        arcRect.right = xCenter + radius - apartDistance + (float) Math.cos(middleAng) * apartDistance;
-        arcRect.top = yCenter - radius + apartDistance + (float) Math.sin(middleAng) * apartDistance;
-        arcRect.bottom = yCenter + radius - apartDistance + (float) Math.sin(middleAng) * apartDistance;
+        selectedArcRect.left = xCenter - radius + apartDistance + (float) Math.cos(middleAng) * apartDistance;
+        selectedArcRect.right = xCenter + radius - apartDistance + (float) Math.cos(middleAng) * apartDistance;
+        selectedArcRect.top = yCenter - radius + apartDistance + (float) Math.sin(middleAng) * apartDistance;
+        selectedArcRect.bottom = yCenter + radius - apartDistance + (float) Math.sin(middleAng) * apartDistance;
   
-        canvas.drawArc(arcRect, data.get(selectedSegment).getStartAngle(),
+        canvas.drawArc(selectedArcRect, data.get(selectedSegment).getStartAngle(),
             data.get(selectedSegment).getDrawingDegree(),
             true, paintSegment);
   
@@ -235,12 +239,7 @@ public class PieChartView extends View {
           
           // Draw a circle segment
           if (i != selectedSegment) {
-            arcRect.left = xCenter - radius + apartDistance;
-            arcRect.top = yCenter - radius + apartDistance;
-            arcRect.right = xCenter + radius - apartDistance;
-            arcRect.bottom = yCenter + radius - apartDistance;
-  
-            canvas.drawArc(arcRect, data.get(i).getStartAngle(), data.get(i).getDrawingDegree(),
+            canvas.drawArc(unselectedArcRect, data.get(i).getStartAngle(), data.get(i).getDrawingDegree(),
                 true, paintSegment);
           }
         }
