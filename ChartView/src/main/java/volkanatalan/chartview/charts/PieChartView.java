@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,7 +30,7 @@ public class PieChartView extends View {
   private int middleCircleColor = Color.WHITE;
   private float radius, xCenter, yCenter;
   private float startAngle = 270;
-  private Paint paintSegment, paintText, paintMiddleCircle;
+  private Paint paintSegment, paintText, paintMiddleCircle, paintBackground;
   private RectF arcRect;
   private ArrayList<PieChartData> data;
   private LockableScrollView lockableScrollView;
@@ -68,6 +69,11 @@ public class PieChartView extends View {
     paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
     paintText.setDither(true);
     paintText.setTextAlign(Paint.Align.CENTER);
+  
+    paintBackground = new Paint(Paint.ANTI_ALIAS_FLAG);
+    paintBackground.setStyle(Paint.Style.FILL);
+    paintBackground.setDither(true);
+    paintBackground.setColor(Color.GRAY);
     
     arcRect = new RectF();
   
@@ -125,6 +131,39 @@ public class PieChartView extends View {
   }
   
   @Override
+  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    int desiredWidth = getSuggestedMinimumWidth() + getPaddingLeft() + getPaddingRight();
+    int desiredHeight = getSuggestedMinimumHeight() + getPaddingTop() + getPaddingBottom();
+    
+    setMeasuredDimension(measureWidth(widthMeasureSpec, heightMeasureSpec),
+        measureHeight(widthMeasureSpec, heightMeasureSpec));
+  }
+  
+  private int measureWidth(int widthMeasureSpec, int heightMeasureSpec) {
+    int widhtSpecMode = MeasureSpec.getMode(widthMeasureSpec);
+    int widhtSpecSize = MeasureSpec.getSize(widthMeasureSpec);
+    int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
+    
+    if (widhtSpecMode == MeasureSpec.EXACTLY) {
+      return widhtSpecSize;
+    } else {
+      return Math.min(widhtSpecSize, heightSpecSize) + getPaddingLeft() + getPaddingRight();
+    }
+  }
+  
+  private int measureHeight(int widthMeasureSpec, int heightMeasureSpec) {
+    int widhtSpecSize = MeasureSpec.getSize(widthMeasureSpec);
+    int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
+    int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
+  
+    if (heightSpecMode == MeasureSpec.EXACTLY) {
+      return heightSpecSize;
+    } else {
+      return Math.min(widhtSpecSize, heightSpecSize) + getPaddingTop() + getPaddingBottom();
+    }
+  }
+  
+  @Override
   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
     setMeasuredDimension(w, h);
@@ -166,6 +205,7 @@ public class PieChartView extends View {
   
   @Override
   protected void onDraw(Canvas canvas) {
+    //canvas.drawPaint(paintBackground);
     if (data != null) {
       if (data.size() > 0) {
         paintText.setColor(textColor);
@@ -240,44 +280,50 @@ public class PieChartView extends View {
     return alignment;
   }
   
-  public void setAlignment(int alignment) {
+  public PieChartView setAlignment(int alignment) {
     this.alignment = alignment;
+    return this;
   }
   
   public ArrayList<PieChartData> getData() {
     return data;
   }
   
-  public void setData(ArrayList<PieChartData> data) {
+  public PieChartView setData(ArrayList<PieChartData> data) {
     this.data = data;
+    return this;
   }
   
   public int[] getColorList() {
     return colorList;
   }
   
-  public void setColorList(int[] colorList) {
+  public PieChartView setColorList(int[] colorList) {
     this.colorList = colorList;
+    return this;
   }
   
-  public int getTextSize() {
+  public int getPercentageTextSize() {
     return textSize;
   }
   
-  public void setTextSize(int textSize) {
+  public PieChartView setPercentageTextSize(int textSize) {
     this.textSize = textSize;
+    return this;
   }
   
-  public int getTextColor() {
+  public int getPercentageTextColor() {
     return textColor;
   }
   
-  public void setTextColor(int textColor) {
+  public PieChartView setPercentageTextColor(int textColor) {
     this.textColor = textColor;
+    return this;
   }
   
-  public void setMiddleCircleColor(int middleCircleColor) {
+  public PieChartView setMiddleCircleColor(int middleCircleColor) {
     this.middleCircleColor = middleCircleColor;
+    return this;
   }
   
   public float getRadius() {
@@ -296,13 +342,16 @@ public class PieChartView extends View {
     return selectedSegment;
   }
   
-  public void setSelectedSegment(int selectedSegment) {
+  public PieChartView setSelectedSegment(int selectedSegment) {
     this.selectedSegment = selectedSegment;
-    if (selectedSegmentChangeListener != null) selectedSegmentChangeListener.onChange(selectedSegment);
+    if (selectedSegmentChangeListener != null)
+      selectedSegmentChangeListener.onChange(selectedSegment);
+    return this;
   }
   
-  public void setLockableScrollView(LockableScrollView lockableScrollView) {
+  public PieChartView setLockableScrollView(LockableScrollView lockableScrollView) {
     this.lockableScrollView = lockableScrollView;
+    return this;
   }
   
   public SelectedSegmentChangeListener getSelectedSegmentChangeListener() {

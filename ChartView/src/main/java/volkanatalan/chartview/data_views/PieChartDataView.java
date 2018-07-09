@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.support.annotation.Nullable;
@@ -40,7 +41,7 @@ public class PieChartDataView extends LinearLayout {
   private TextView labelTV;
   private AttributeSet attrs;
   private PieChartView pieChartView;
-  public enum ColorBoxShape {RECT, CIRCLE}
+  public enum ColorBoxShape {RECT, CIRCLE, TRIANGLE_UP, TRIANGLE_RIGHT, TRIANGLE_DOWN, TRIANGLE_LEFT}
   private ColorBoxShape colorBoxShape = ColorBoxShape.CIRCLE;
   
   
@@ -112,30 +113,57 @@ public class PieChartDataView extends LinearLayout {
     LayoutParams colorBoxParams = new LayoutParams(colorBoxDimension, colorBoxDimension);
     colorBoxParams.setMarginEnd(colorBoxMarginEnd);
   
-    final Paint colorBoxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    colorBoxPaint.setDither(true);
-  
     for (int i = 0; i < pieChartValues.size(); i++) {
+      final int pos = i;
       
       horizontalLL = new LinearLayout(context);
       labelTV = new TextView(context);
-      final int pos = i;
       colorBox = new View(context){
+        
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
           setMeasuredDimension(colorBoxDimension, colorBoxDimension);
         }
   
+        Path triangle = new Path();
+        Paint colorBoxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+  
         @Override
         protected void onDraw(Canvas canvas) {
           super.onDraw(canvas);
+          colorBoxPaint.setStyle(Paint.Style.FILL);
+          colorBoxPaint.setDither(true);
           colorBoxPaint.setColor(colorList[pos]);
           
           if (colorBoxShape == ColorBoxShape.CIRCLE) {
             canvas.drawCircle(canvas.getWidth() / 2, canvas.getHeight() / 2,
                 canvas.getHeight() / 2, colorBoxPaint);
-          } else {
+          } else if (colorBoxShape == ColorBoxShape.RECT) {
             canvas.drawPaint(colorBoxPaint);
+          } else if (colorBoxShape == ColorBoxShape.TRIANGLE_UP) {
+            triangle.moveTo(canvas.getWidth() / 2, 0);
+            triangle.lineTo(canvas.getWidth(), canvas.getHeight());
+            triangle.lineTo(0, canvas.getHeight());
+            triangle.close();
+            canvas.drawPath(triangle, colorBoxPaint);
+          } else if (colorBoxShape == ColorBoxShape.TRIANGLE_RIGHT) {
+            triangle.moveTo(0, 0);
+            triangle.lineTo(canvas.getWidth(), canvas.getHeight() / 2);
+            triangle.lineTo(0, canvas.getHeight());
+            triangle.close();
+            canvas.drawPath(triangle, colorBoxPaint);
+          } else if (colorBoxShape == ColorBoxShape.TRIANGLE_DOWN) {
+            triangle.moveTo(0, 0);
+            triangle.lineTo(canvas.getWidth(), 0);
+            triangle.lineTo(canvas.getWidth() / 2, canvas.getHeight());
+            triangle.close();
+            canvas.drawPath(triangle, colorBoxPaint);
+          } else if (colorBoxShape == ColorBoxShape.TRIANGLE_LEFT) {
+            triangle.moveTo(canvas.getWidth(), 0);
+            triangle.lineTo(canvas.getWidth(), canvas.getHeight());
+            triangle.lineTo(0, canvas.getHeight() / 2);
+            triangle.close();
+            canvas.drawPath(triangle, colorBoxPaint);
           }
         }
       };
@@ -175,7 +203,7 @@ public class PieChartDataView extends LinearLayout {
     }
   }
   
-  public void bindTo(PieChartView pieChartView) {
+  public PieChartDataView bindTo(PieChartView pieChartView) {
     this.pieChartView = pieChartView;
   
     this.pieChartView.setSelectedSegmentChangeListener(new PieChartView.SelectedSegmentChangeListener() {
@@ -185,54 +213,62 @@ public class PieChartDataView extends LinearLayout {
         draw();
       }
     });
+    return this;
   }
   
-  public void setData(ArrayList<PieChartData> pieChartValues) {
+  public PieChartDataView setData(ArrayList<PieChartData> pieChartValues) {
     this.pieChartValues = pieChartValues;
+    return this;
   }
   
   public int getTextColor() {
     return textColor;
   }
   
-  public void setTextColor(int textColor) {
+  public PieChartDataView setTextColor(int textColor) {
     this.textColor = textColor;
+    return this;
   }
   
   public int getTextSize() {
     return textSize;
   }
   
-  public void setTextSize(int textSize) {
+  public PieChartDataView setTextSize(int textSize) {
     this.textSize = textSize;
+    return this;
   }
   
   public int[] getColorList() {
     return colorList;
   }
   
-  public void setColorList(int[] colorList) {
+  public PieChartDataView setColorList(int[] colorList) {
     this.colorList = colorList;
+    return this;
   }
   
-  public void setColorBoxShape(ColorBoxShape shape) {
+  public PieChartDataView setColorBoxShape(ColorBoxShape shape) {
     this.colorBoxShape = shape;
+    return this;
   }
   
   public int getColorBoxDimension() {
     return colorBoxDimension;
   }
   
-  public void setColorBoxDimension(int colorBoxDimension) {
+  public PieChartDataView setColorBoxDimension(int colorBoxDimension) {
     this.colorBoxDimension = colorBoxDimension;
+    return this;
   }
   
   public int getColorBoxMarginEnd() {
     return colorBoxMarginEnd;
   }
   
-  public void setColorBoxMarginEnd(int colorBoxMarginEnd) {
+  public PieChartDataView setColorBoxMarginEnd(int colorBoxMarginEnd) {
     this.colorBoxMarginEnd = colorBoxMarginEnd;
+    return this;
   }
   
   @Override
@@ -240,8 +276,9 @@ public class PieChartDataView extends LinearLayout {
     return paddingLeft;
   }
   
-  public void setPaddingLeft(int paddingLeft) {
+  public PieChartDataView setPaddingLeft(int paddingLeft) {
     this.paddingLeft = paddingLeft;
+    return this;
   }
   
   @Override
@@ -249,8 +286,9 @@ public class PieChartDataView extends LinearLayout {
     return paddingTop;
   }
   
-  public void setPaddingTop(int paddingTop) {
+  public PieChartDataView setPaddingTop(int paddingTop) {
     this.paddingTop = paddingTop;
+    return this;
   }
   
   @Override
@@ -258,8 +296,9 @@ public class PieChartDataView extends LinearLayout {
     return paddingRight;
   }
   
-  public void setPaddingRight(int paddingRight) {
+  public PieChartDataView setPaddingRight(int paddingRight) {
     this.paddingRight = paddingRight;
+    return this;
   }
   
   @Override
@@ -267,39 +306,44 @@ public class PieChartDataView extends LinearLayout {
     return paddingBottom;
   }
   
-  public void setPaddingBottom(int paddingBottom) {
+  public PieChartDataView setPaddingBottom(int paddingBottom) {
     this.paddingBottom = paddingBottom;
+    return this;
   }
   
   public int getMarginLeft() {
     return marginLeft;
   }
   
-  public void setMarginLeft(int marginLeft) {
+  public PieChartDataView setMarginLeft(int marginLeft) {
     this.marginLeft = marginLeft;
+    return this;
   }
   
   public int getMarginTop() {
     return marginTop;
   }
   
-  public void setMarginTop(int marginTop) {
+  public PieChartDataView setMarginTop(int marginTop) {
     this.marginTop = marginTop;
+    return this;
   }
   
   public int getMarginRight() {
     return marginRight;
   }
   
-  public void setMarginRight(int marginRight) {
+  public PieChartDataView setMarginRight(int marginRight) {
     this.marginRight = marginRight;
+    return this;
   }
   
   public int getMarginBottom() {
     return marginBottom;
   }
   
-  public void setMarginBottom(int marginBottom) {
+  public PieChartDataView setMarginBottom(int marginBottom) {
     this.marginBottom = marginBottom;
+    return this;
   }
 }

@@ -36,13 +36,14 @@ public class PieChart extends Fragment {
     pieChartView = v.findViewById(R.id.pieChartView);
     pieChartDataView = v.findViewById(R.id.pieChartValueView);
     
-    pieChartView.setData(pieChartData);
-    pieChartView.draw(); // or pieChartView.invalidate();
+    pieChartView.setData(pieChartData)
+        .draw(); // or .invalidate();
     
-    pieChartDataView.setData(pieChartData);
-    pieChartDataView.bindTo(pieChartView);
-    pieChartDataView.setColorBoxDimension(13);
-    pieChartDataView.draw(); // or pieChartValueView.invalidate();
+    pieChartDataView.setData(pieChartData)
+        .bindTo(pieChartView)
+        .setColorBoxDimension(13)
+        .setColorBoxShape(PieChartDataView.ColorBoxShape.CIRCLE)
+        .draw();
     
     root.setOnClickListener(new View.OnClickListener() {
       @Override

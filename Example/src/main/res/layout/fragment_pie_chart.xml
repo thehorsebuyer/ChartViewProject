@@ -16,9 +16,8 @@
 
         <volkanatalan.chartview.charts.PieChartView
             android:id="@+id/pieChartView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
         <volkanatalan.chartview.data_views.PieChartDataView
             android:id="@+id/pieChartValueView"
