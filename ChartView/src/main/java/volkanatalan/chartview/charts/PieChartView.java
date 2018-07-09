@@ -135,32 +135,19 @@ public class PieChartView extends View {
     int desiredWidth = getSuggestedMinimumWidth() + getPaddingLeft() + getPaddingRight();
     int desiredHeight = getSuggestedMinimumHeight() + getPaddingTop() + getPaddingBottom();
     
-    setMeasuredDimension(measureWidth(widthMeasureSpec, heightMeasureSpec),
-        measureHeight(widthMeasureSpec, heightMeasureSpec));
+    setMeasuredDimension(measureDimension(widthMeasureSpec, heightMeasureSpec),
+        measureDimension(heightMeasureSpec, widthMeasureSpec));
   }
   
-  private int measureWidth(int widthMeasureSpec, int heightMeasureSpec) {
-    int widhtSpecMode = MeasureSpec.getMode(widthMeasureSpec);
-    int widhtSpecSize = MeasureSpec.getSize(widthMeasureSpec);
-    int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
+  private int measureDimension(int thisMeasureSpec, int otherMeasureSpec) {
+    int thisSpecMode = MeasureSpec.getMode(thisMeasureSpec);
+    int thisSpecSize = MeasureSpec.getSize(thisMeasureSpec);
+    int otherSpecSize = MeasureSpec.getSize(otherMeasureSpec);
     
-    if (widhtSpecMode == MeasureSpec.EXACTLY) {
-      return widhtSpecSize;
-    } else {
-      return Math.min(widhtSpecSize, heightSpecSize) + getPaddingLeft() + getPaddingRight();
-    }
-  }
-  
-  private int measureHeight(int widthMeasureSpec, int heightMeasureSpec) {
-    int widhtSpecSize = MeasureSpec.getSize(widthMeasureSpec);
-    int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
-    int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
-  
-    if (heightSpecMode == MeasureSpec.EXACTLY) {
-      return heightSpecSize;
-    } else {
-      return Math.min(widhtSpecSize, heightSpecSize) + getPaddingTop() + getPaddingBottom();
-    }
+    if (thisSpecMode == MeasureSpec.EXACTLY)
+      return thisSpecSize;
+    else
+      return Math.min(thisSpecSize, otherSpecSize) + getPaddingLeft() + getPaddingRight();
   }
   
   @Override
