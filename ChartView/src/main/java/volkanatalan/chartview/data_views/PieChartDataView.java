@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Typeface;
-import android.graphics.drawable.ShapeDrawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -37,9 +36,9 @@ public class PieChartDataView extends LinearLayout {
   private int selectedSegment = 0;
   private int[] colorList = getContext().getResources().getIntArray(R.array.pie_chart_color_list);
   private ArrayList<PieChartData> pieChartValues;
-  private LinearLayout horizontalLL;
+  private LinearLayout containerLayout;
   private View colorBox;
-  private TextView labelTV;
+  private TextView titleTV;
   private AttributeSet attrs;
   private PieChartView pieChartView;
   public enum ColorBoxShape {RECT, CIRCLE, TRIANGLE_UP, TRIANGLE_RIGHT, TRIANGLE_DOWN, TRIANGLE_LEFT}
@@ -49,21 +48,56 @@ public class PieChartDataView extends LinearLayout {
   public PieChartDataView(Context context) {
     super(context);
     this.context = context;
-    start();
+    if (isInEditMode()) {
+      editModeDisplay();
+    } else {
+      start();
+    }
   }
   
   public PieChartDataView(Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
     this.context = context;
     this.attrs = attrs;
-    start();
+    if (isInEditMode()) {
+      editModeDisplay();
+    } else {
+      start();
+    }
   }
   
   public PieChartDataView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
     this.context = context;
     this.attrs = attrs;
-    start();
+    if (isInEditMode()) {
+      editModeDisplay();
+    } else {
+      start();
+    }
+  }
+  
+  private void editModeDisplay() {
+    
+    String[] titles = {"Title 1", "Title 2", "Title 3", "Title 4", "Title 5", };
+    
+    for (int i = 0; i < titles.length; i++) {
+      
+      LinearLayout containerLayout = new LinearLayout(context);
+      View colorBox = new View(context);
+      TextView titleTV = new TextView(context);
+      
+      colorBox.setLayoutParams(new ViewGroup.LayoutParams(10, 10));
+      colorBox.setBackgroundColor(colorList[i]);
+      titleTV.setText(titles[i]);
+      containerLayout.setOrientation(HORIZONTAL);
+      containerLayout.setGravity(Gravity.CENTER_VERTICAL);
+      this.setOrientation(VERTICAL);
+      
+      containerLayout.addView(colorBox);
+      containerLayout.addView(titleTV);
+      this.addView(containerLayout);
+    }
   }
   
   @SuppressLint("ClickableViewAccessibility")
@@ -118,8 +152,8 @@ public class PieChartDataView extends LinearLayout {
     for (int i = 0; i < pieChartValues.size(); i++) {
       final int pos = i;
       
-      horizontalLL = new LinearLayout(context);
-      labelTV = new TextView(context);
+      containerLayout = new LinearLayout(context);
+      titleTV = new TextView(context);
       colorBox = new View(context){
         
         @Override
@@ -170,16 +204,16 @@ public class PieChartDataView extends LinearLayout {
         }
       };
   
-      labelTV.setLayoutParams(new ViewGroup.LayoutParams(
+      titleTV.setLayoutParams(new ViewGroup.LayoutParams(
           ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-      horizontalLL.setLayoutParams(new ViewGroup.LayoutParams(
+      containerLayout.setLayoutParams(new ViewGroup.LayoutParams(
           ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
   
       if (i == selectedSegment)
-        labelTV.setTypeface(Typeface.DEFAULT_BOLD);
+        titleTV.setTypeface(Typeface.DEFAULT_BOLD);
       else
-        labelTV.setTypeface(Typeface.DEFAULT);
-      labelTV.setPadding(10, 0, 0, 0);
+        titleTV.setTypeface(Typeface.DEFAULT);
+      titleTV.setPadding(10, 0, 0, 0);
     
       this.setOrientation(VERTICAL);
       this.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
@@ -194,21 +228,21 @@ public class PieChartDataView extends LinearLayout {
             marginLeft, marginTop, marginRight, marginBottom);
       }
     
-      horizontalLL.setLayoutParams(horizontalLLParams);
-      horizontalLL.setOrientation(HORIZONTAL);
-      horizontalLL.setGravity(Gravity.CENTER_VERTICAL);
+      containerLayout.setLayoutParams(horizontalLLParams);
+      containerLayout.setOrientation(HORIZONTAL);
+      containerLayout.setGravity(Gravity.CENTER_VERTICAL);
     
       //colorBox.setLayoutParams(colorBoxParams);
     
-      labelTV.setTextColor(Color.BLACK);
-      labelTV.setTextSize(30);
+      titleTV.setTextColor(Color.BLACK);
+      titleTV.setTextSize(30);
     
-      labelTV.setText(pieChartValues.get(i).getTitle() + " (" + pieChartValues.get(i).getValue() + ")");
-      horizontalLL.addView(colorBox);
-      horizontalLL.addView(labelTV);
+      titleTV.setText(pieChartValues.get(i).getTitle() + " (" + pieChartValues.get(i).getValue() + ")");
+      containerLayout.addView(colorBox);
+      containerLayout.addView(titleTV);
   
-      heightSumOfViews += horizontalLL.getHeight();
-      this.addView(horizontalLL);
+      heightSumOfViews += containerLayout.getHeight();
+      this.addView(containerLayout);
     }
     //setMeasuredDimension(measureWidth(widthMeasureSpec), measureHeight(heightMeasureSpec));
   }
