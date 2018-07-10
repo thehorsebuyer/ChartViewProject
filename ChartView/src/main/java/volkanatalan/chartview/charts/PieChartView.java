@@ -131,22 +131,46 @@ public class PieChartView extends View {
   
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    int desiredWidth = getSuggestedMinimumWidth() + getPaddingLeft() + getPaddingRight();
-    int desiredHeight = getSuggestedMinimumHeight() + getPaddingTop() + getPaddingBottom();
-    
-    setMeasuredDimension(measureDimension(widthMeasureSpec, heightMeasureSpec),
-        measureDimension(heightMeasureSpec, widthMeasureSpec));
+    setMeasuredDimension(measureWidth(widthMeasureSpec, heightMeasureSpec),
+        measureHeight(widthMeasureSpec, heightMeasureSpec));
   }
   
-  private int measureDimension(int thisMeasureSpec, int otherMeasureSpec) {
-    int thisSpecMode = MeasureSpec.getMode(thisMeasureSpec);
-    int thisSpecSize = MeasureSpec.getSize(thisMeasureSpec);
-    int otherSpecSize = MeasureSpec.getSize(otherMeasureSpec);
+  private int measureWidth(int widthMeasureSpec, int heightMeasureSpec) {
+    int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
+    int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
+    int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
+    int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
     
-    if (thisSpecMode == MeasureSpec.EXACTLY)
-      return thisSpecSize;
-    else
-      return Math.min(thisSpecSize, otherSpecSize) + getPaddingLeft() + getPaddingRight();
+    if (widthSpecMode == MeasureSpec.EXACTLY) {
+      return widthSpecSize;
+    } else if (widthSpecMode == MeasureSpec.AT_MOST && heightSpecMode == MeasureSpec.EXACTLY) {
+      if (widthSpecSize < heightSpecSize) {
+        return widthSpecSize;
+      } else {
+        return heightSpecSize + getPaddingLeft() + getPaddingRight();
+      }
+    } else {
+      return Math.min(widthSpecSize, heightSpecSize);
+    }
+  }
+  
+  private int measureHeight(int widthMeasureSpec, int heightMeasureSpec) {
+    int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
+    int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
+    int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
+    int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
+  
+    if (heightSpecMode == MeasureSpec.EXACTLY) {
+      return heightSpecSize;
+    } else if (heightSpecMode == MeasureSpec.AT_MOST && widthSpecMode == MeasureSpec.EXACTLY) {
+      if (heightSpecSize < widthSpecSize) {
+        return heightSpecSize;
+      } else {
+        return widthSpecSize + getPaddingTop() + getPaddingBottom();
+      }
+    } else {
+      return Math.min(widthSpecSize, heightSpecSize);
+    }
   }
   
   @Override
@@ -154,16 +178,30 @@ public class PieChartView extends View {
     super.onSizeChanged(w, h, oldw, oldh);
     setMeasuredDimension(w, h);
     
-    radius = Math.min(w, h) / 2;
-    xCenter = w / 2;
-    yCenter = h / 2;
+    xCenter = (w / 2) + getPaddingLeft() - getPaddingRight();
+    yCenter = (h / 2) + getPaddingTop() - getPaddingBottom();
   
+    float topToCenter = yCenter - getPaddingTop();
+    float rightToCenter = w - xCenter - getPaddingRight();
+    float bottomToCenter = h - yCenter - getPaddingBottom();
+    float leftToCenter = xCenter - getPaddingLeft();
+    
+    radius = Math.min(Math.min(topToCenter, rightToCenter), Math.min(bottomToCenter, leftToCenter));
+  
+    // Dimension of unselected circle segments' rect
+    unselectedArcRect.left = xCenter - radius + apartDistance;
+    unselectedArcRect.top = yCenter - radius + apartDistance;
+    unselectedArcRect.right = xCenter + radius - apartDistance;
+    unselectedArcRect.bottom = yCenter + radius - apartDistance;
+    
     if (data != null) {
       if (data.size() > 0) {
         double sum = 0;
+        
         for (PieChartData value : data) {
           sum += value.getValue();
         }
+        
         double devisor360 = sum / 360;
         double devisor100 = sum / 100;
         
@@ -187,16 +225,10 @@ public class PieChartView extends View {
         }
       }
     }
-  
-    unselectedArcRect.left = xCenter - radius + apartDistance;
-    unselectedArcRect.top = yCenter - radius + apartDistance;
-    unselectedArcRect.right = xCenter + radius - apartDistance;
-    unselectedArcRect.bottom = yCenter + radius - apartDistance;
   }
   
   @Override
   protected void onDraw(Canvas canvas) {
-    //canvas.drawPaint(paintBackground);
     if (data != null) {
       if (data.size() > 0) {
         paintText.setColor(textColor);
@@ -244,31 +276,17 @@ public class PieChartView extends View {
           }
         }
         
-        // Draw gradient
-        //canvas.drawCircle(xCenter, yCenter, radius, paintGradient);
-  
         // Make hole
         canvas.drawCircle(xCenter, yCenter, radius / 2, paintMiddleCircle);
         
         canvas.drawText(Calc.round(data.get(selectedSegment).getPercentage(), 1) + "%",
             xCenter, yCenter + textSize / 3, paintText);
-  
-        //arcShape.draw(canvas, paintMiddleCircle);
       }
     }
   }
   
   public void draw() {
     invalidate();
-  }
-  
-  public int getAlignment() {
-    return alignment;
-  }
-  
-  public PieChartView setAlignment(int alignment) {
-    this.alignment = alignment;
-    return this;
   }
   
   public ArrayList<PieChartData> getData() {
