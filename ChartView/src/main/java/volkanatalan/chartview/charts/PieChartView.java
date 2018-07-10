@@ -19,7 +19,6 @@ import java.util.ArrayList;
 
 public class PieChartView extends View {
   
-  private int alignment = 0;
   private int textSize = 30;
   private int apartDistance = 10;
   private int selectedSegment = 0;
@@ -27,7 +26,7 @@ public class PieChartView extends View {
   private int middleCircleColor = Color.WHITE;
   private float radius, xCenter, yCenter;
   private float startAngle = 270;
-  private Paint paintSegment, paintText, paintMiddleCircle, paintBackground;
+  private Paint paintSegment, paintText, paintMiddleCircle;
   private RectF selectedArcRect, unselectedArcRect;
   private ArrayList<PieChartData> data;
   private LockableScrollView lockableScrollView;
@@ -36,17 +35,41 @@ public class PieChartView extends View {
   
   public PieChartView(Context context) {
     super(context);
-    start();
+    if (isInEditMode()) {
+      editModeDisplay();
+    } else {
+      start();
+    }
   }
   
   public PieChartView(Context context, AttributeSet attrs) {
     super(context, attrs);
-    start();
+    if (isInEditMode()) {
+      editModeDisplay();
+    } else {
+      start();
+    }
   }
   
   public PieChartView(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
+    if (isInEditMode()) {
+      editModeDisplay();
+    } else {
+      start();
+    }
+  }
+  
+  private void editModeDisplay() {
     start();
+    ArrayList<PieChartData> data = new ArrayList<>();
+    data.add(new PieChartData(5, "Title1"));
+    data.add(new PieChartData(4, "Title2"));
+    data.add(new PieChartData(3, "Title3"));
+    data.add(new PieChartData(2, "Title4"));
+    data.add(new PieChartData(1, "Title5"));
+    this.setData(data);
+    this.draw();
   }
   
   public interface SelectedSegmentChangeListener {
@@ -66,11 +89,6 @@ public class PieChartView extends View {
     paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
     paintText.setDither(true);
     paintText.setTextAlign(Paint.Align.CENTER);
-  
-    paintBackground = new Paint(Paint.ANTI_ALIAS_FLAG);
-    paintBackground.setStyle(Paint.Style.FILL);
-    paintBackground.setDither(true);
-    paintBackground.setColor(Color.GRAY);
     
     selectedArcRect = new RectF();
     
