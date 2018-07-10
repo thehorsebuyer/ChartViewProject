@@ -1,6 +1,7 @@
 package volkanatalan.chartviewproject.fragments;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -44,7 +45,6 @@ public class PieChart extends Fragment {
         .setColorBoxDimension(13)
         .setColorBoxShape(PieChartDataView.ColorBoxShape.CIRCLE)
         .draw();
-    
     root.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {

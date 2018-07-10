@@ -14,6 +14,7 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -110,6 +111,7 @@ public class PieChartDataView extends LinearLayout {
   @SuppressLint("ClickableViewAccessibility")
   public void draw() {
     removeAllViews();
+    float heightSumOfViews = 0f;
     LayoutParams colorBoxParams = new LayoutParams(colorBoxDimension, colorBoxDimension);
     colorBoxParams.setMarginEnd(colorBoxMarginEnd);
   
@@ -168,6 +170,11 @@ public class PieChartDataView extends LinearLayout {
         }
       };
   
+      labelTV.setLayoutParams(new ViewGroup.LayoutParams(
+          ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+      horizontalLL.setLayoutParams(new ViewGroup.LayoutParams(
+          ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+  
       if (i == selectedSegment)
         labelTV.setTypeface(Typeface.DEFAULT_BOLD);
       else
@@ -199,8 +206,11 @@ public class PieChartDataView extends LinearLayout {
       labelTV.setText(pieChartValues.get(i).getTitle() + " (" + pieChartValues.get(i).getValue() + ")");
       horizontalLL.addView(colorBox);
       horizontalLL.addView(labelTV);
+  
+      heightSumOfViews += horizontalLL.getHeight();
       this.addView(horizontalLL);
     }
+    //setMeasuredDimension(measureWidth(widthMeasureSpec), measureHeight(heightMeasureSpec));
   }
   
   public PieChartDataView bindTo(PieChartView pieChartView) {
