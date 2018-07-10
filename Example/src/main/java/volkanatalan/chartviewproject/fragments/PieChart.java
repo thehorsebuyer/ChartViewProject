@@ -45,6 +45,7 @@ public class PieChart extends Fragment {
         .setColorBoxDimension(13)
         .setColorBoxShape(PieChartDataView.ColorBoxShape.CIRCLE)
         .draw();
+    
     root.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {

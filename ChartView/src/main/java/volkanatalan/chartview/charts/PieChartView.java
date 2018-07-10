@@ -24,52 +24,49 @@ public class PieChartView extends View {
   private int selectedSegment = 0;
   private int textColor = Color.BLACK;
   private int middleCircleColor = Color.WHITE;
+  private int[] colorList = getContext().getResources().getIntArray(R.array.pie_chart_color_list);
   private float radius, xCenter, yCenter;
   private float startAngle = 270;
   private Paint paintSegment, paintText, paintMiddleCircle;
   private RectF selectedArcRect, unselectedArcRect;
   private ArrayList<PieChartData> data;
   private LockableScrollView lockableScrollView;
-  private int[] colorList = getContext().getResources().getIntArray(R.array.pie_chart_color_list);
   private SelectedSegmentChangeListener selectedSegmentChangeListener;
   
   public PieChartView(Context context) {
     super(context);
+    start();
     if (isInEditMode()) {
       editModeDisplay();
-    } else {
-      start();
     }
   }
   
   public PieChartView(Context context, AttributeSet attrs) {
     super(context, attrs);
+    start();
     if (isInEditMode()) {
       editModeDisplay();
-    } else {
-      start();
     }
   }
   
   public PieChartView(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
+    start();
     if (isInEditMode()) {
       editModeDisplay();
-    } else {
-      start();
     }
   }
   
   private void editModeDisplay() {
-    start();
     ArrayList<PieChartData> data = new ArrayList<>();
-    data.add(new PieChartData(5, "Title1"));
-    data.add(new PieChartData(4, "Title2"));
-    data.add(new PieChartData(3, "Title3"));
-    data.add(new PieChartData(2, "Title4"));
-    data.add(new PieChartData(1, "Title5"));
-    this.setData(data);
-    this.draw();
+    data.add(new PieChartData(500, "Title1"));
+    data.add(new PieChartData(400, "Title2"));
+    data.add(new PieChartData(300, "Title3"));
+    data.add(new PieChartData(200, "Title4"));
+    data.add(new PieChartData(100, "Title5"));
+    
+    this.setData(data)
+        .draw();
   }
   
   public interface SelectedSegmentChangeListener {
