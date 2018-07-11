@@ -38,12 +38,18 @@ public class PieChart extends Fragment {
     pieChartDataView = v.findViewById(R.id.pieChartValueView);
     
     pieChartView.setData(pieChartData)
+        .setMiddleCircleColor(getActivity().getResources().getColor(R.color.spaceGray))
+        .setPercentageTextColor(Color.WHITE)
         .draw(); // or .invalidate();
     
     pieChartDataView.setData(pieChartData)
         .bindTo(pieChartView)
+        .setTextColor(Color.WHITE)
+        .setTextSize(30)
         .setColorBoxDimension(13)
         .setColorBoxShape(PieChartDataView.ColorBoxShape.CIRCLE)
+        .setDistanceBetweenColorBoxAndText(10)
+        .makeSelectorLonger(50)
         .draw();
     
     root.setOnClickListener(new View.OnClickListener() {
