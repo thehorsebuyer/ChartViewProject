@@ -28,7 +28,14 @@
         <volkanatalan.chartview.data_views.PieChartDataView
             android:id="@+id/pieChartDataView"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            app:textColor="@color/white"
+            app:textSize="40sp"
+            app:selectorOverage="50dp"
+            app:colorBoxDimension="15dp"
+            app:distanceBetweenColorBoxAndText="10dp"
+            app:colorBoxShape="CIRCLE"
+            app:colorBoxPosition="LEFT" />
 
     </LinearLayout>
 

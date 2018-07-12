@@ -51,14 +51,6 @@ public class PieChart extends Fragment {
     
     pieChartDataView.setData(pieChartData)
         .bindTo(pieChartView)
-        .setTextColor(Color.WHITE)
-        .setTextSize(40)
-        .setSelectorColor(getContext().getResources().getColor(R.color.selector_color))
-        .setColorBoxShape(PieChartDataView.ColorBoxShape.SQUARE)
-        .setColorBoxDimension(15)
-        .setColorBoxPosition(PieChartDataView.ColorBoxPosition.LEFT)
-        .setSelectorOverage(50)
-        .setDistanceBetweenColorBoxAndText(10)
         .draw();
     
     root.setOnClickListener(new View.OnClickListener() {
