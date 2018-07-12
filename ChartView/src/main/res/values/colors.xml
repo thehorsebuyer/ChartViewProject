@@ -13,6 +13,7 @@
     <color name="white">#ffffff </color>
     <color name="white_a50">#32ffffff</color>
     <color name="black_a70">#46232323</color>
+    <color name="selector_color">#46ffffff</color>
 
     <array name="pie_chart_color_list">
         <item>@color/red</item>

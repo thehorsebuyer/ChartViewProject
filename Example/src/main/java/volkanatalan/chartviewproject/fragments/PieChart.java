@@ -1,6 +1,5 @@
 package volkanatalan.chartviewproject.fragments;
 
-
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -30,37 +29,6 @@ public class PieChart extends Fragment {
   }
   
   @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
-    View v = inflater.inflate(R.layout.fragment_pie_chart, container, false);
-    FrameLayout root = v.findViewById(R.id.root);
-    pieChartView = v.findViewById(R.id.pieChartView);
-    pieChartDataView = v.findViewById(R.id.pieChartValueView);
-    
-    pieChartView.setData(pieChartData)
-        .setMiddleCircleColor(getActivity().getResources().getColor(R.color.spaceGray))
-        .setPercentageTextColor(Color.WHITE)
-        .draw(); // or .invalidate();
-    
-    pieChartDataView.setData(pieChartData)
-        .bindTo(pieChartView)
-        .setTextColor(Color.WHITE)
-        .setTextSize(30)
-        .setColorBoxDimension(13)
-        .setColorBoxShape(PieChartDataView.ColorBoxShape.CIRCLE)
-        .setDistanceBetweenColorBoxAndText(10)
-        .makeSelectorLonger(50)
-        .draw();
-    
-    root.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-      }
-    });
-    return v;
-  }
-  
-  @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     pieChartData = new ArrayList<>();
@@ -71,4 +39,26 @@ public class PieChart extends Fragment {
     pieChartData.add(new PieChartData(168, "Item 5"));
   }
   
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                           Bundle savedInstanceState) {
+    View v = inflater.inflate(R.layout.fragment_pie_chart, container, false);
+    FrameLayout root = v.findViewById(R.id.root);
+    pieChartView = v.findViewById(R.id.pieChartView);
+    pieChartDataView = v.findViewById(R.id.pieChartValueView);
+    
+    pieChartView.setData(pieChartData)
+        .draw(); // or .invalidate();
+    
+    pieChartDataView.setData(pieChartData)
+        .bindTo(pieChartView)
+        .draw();
+    
+    root.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+      }
+    });
+    return v;
+  }
 }

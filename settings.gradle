@@ -1,1 +1,1 @@
-include ':Example', ':ChartView2', ':ChartView'
+include ':Example', ':ChartView'

@@ -1,22 +1,27 @@
 package volkanatalan.chartview.data_views;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import volkanatalan.chartview.Calc;
 import volkanatalan.chartview.R;
 import volkanatalan.chartview.charts.PieChartView;
 import volkanatalan.chartview.datas.PieChartData;
@@ -25,24 +30,58 @@ import java.util.ArrayList;
 
 public class PieChartDataView extends RelativeLayout {
   private Context context;
-  private int textColor = Color.BLACK;
-  private int textSize = 14;
-  private int selectorColor = Color.GRAY;
-  private int colorBoxDimension = 10;
-  private int colorBoxMarginEnd = 20;
-  private int selectedSegment = 0;
+  private TypedArray typedArray;
   private int widthMeasureMode;
-  private int containerLPaddingLeft = 0;
-  private int containerLPaddingRight = 0;
-  private int textPaddingLeft = 0;
-  private int[] colorList = getContext().getResources().getIntArray(R.array.pie_chart_color_list);
   private LinearLayout mainContainer;
   private RelativeLayout selector;
   private ArrayList<PieChartData> pieChartValues;
   private ArrayList<LinearLayout> containerLayoutList = new ArrayList<>();
   private PieChartView pieChartView;
+  private OnContainerLayoutDimensionChanged onContainerLayoutDimensionChanged;
+  
+  private int textColor = Color.BLACK;
+  private int textSize = 14;
+  private int selectorColor = getContext().getResources().getColor(R.color.selector_color);
+  private int colorBoxDimension = 10;
+  private int colorBoxMarginEnd = 20;
+  private int selectedSegment = 0;
+  private int selectorOverage = 0;
+  private int distanceBetweenColorBoxAndText = 10;
+  private int[] colorList = getContext().getResources().getIntArray(R.array.pie_chart_color_list);
   private ColorBoxShape colorBoxShape = ColorBoxShape.CIRCLE;
-  public enum ColorBoxShape {RECT, CIRCLE, TRIANGLE_UP, TRIANGLE_RIGHT, TRIANGLE_DOWN, TRIANGLE_LEFT}
+  private ColorBoxPosition colorBoxPosition = ColorBoxPosition.LEFT;
+  
+  public enum ColorBoxShape {
+    RECT(0), CIRCLE(1), TRIANGLE_UP(2), TRIANGLE_RIGHT(3), TRIANGLE_DOWN(4), TRIANGLE_LEFT(5);
+    int id;
+  
+    ColorBoxShape(int id) {
+      this.id = id;
+    }
+  
+    static ColorBoxShape fromId(int id) {
+      for (ColorBoxShape c : ColorBoxShape.values()) {
+        if (c.id == id) return c;
+      }
+      throw new IllegalArgumentException();
+    }
+  }
+  
+  public enum ColorBoxPosition {
+    LEFT(0), RIGHT(1);
+    int id;
+  
+    ColorBoxPosition(int id) {
+      this.id = id;
+    }
+  
+    static ColorBoxPosition fromId(int id) {
+      for (ColorBoxPosition c : ColorBoxPosition.values()) {
+        if (c.id == id) return c;
+      }
+      throw new IllegalArgumentException();
+    }
+  }
   
   
   public PieChartDataView(Context context) {
@@ -57,6 +96,7 @@ public class PieChartDataView extends RelativeLayout {
   public PieChartDataView(Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
     this.context = context;
+    this.typedArray = context.obtainStyledAttributes(attrs, R.styleable.PieChartDataView);
     start();
     if (isInEditMode()) {
       editModeDisplay();
@@ -66,6 +106,7 @@ public class PieChartDataView extends RelativeLayout {
   public PieChartDataView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
     this.context = context;
+    this.typedArray = context.obtainStyledAttributes(attrs, R.styleable.PieChartDataView, defStyleAttr, 0);
     start();
     if (isInEditMode()) {
       editModeDisplay();
@@ -88,6 +129,7 @@ public class PieChartDataView extends RelativeLayout {
   
   @SuppressLint("ClickableViewAccessibility")
   private void start() {
+    setAttrs();
     OnTouchListener onTouchListener = new OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -105,18 +147,37 @@ public class PieChartDataView extends RelativeLayout {
         return true;
       }
     };
+    
+    setOnContainerLayoutDimensionChanged(new OnContainerLayoutDimensionChanged() {
+      @Override
+      public void onChanged(int top, int bottom) {
+        calibrateSelector(top, bottom);
+        selector.requestLayout();
+      }
+    });
+    
     setOnTouchListener(onTouchListener);
     getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
       @Override
       public void onGlobalLayout() {
-//        int bottom = containerLayoutList.get(0).getBottom();
-//        int top = containerLayoutList.get(0).getTop();
-//        calibrateSelector(top, bottom);
         if (widthMeasureMode == MeasureSpec.AT_MOST) {
           setLayoutParams(new LinearLayout.LayoutParams(
               mainContainer.getWidth() + getPaddingRight() + getPaddingLeft(), getHeight()));
         }
         getViewTreeObserver().removeOnGlobalLayoutListener(this);
+      }
+    });
+    
+    getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+      @Override
+      public void onGlobalLayout() {
+        if (containerLayoutList.get(0).getTop() > 0 || containerLayoutList.get(0).getBottom() > 0) {
+          
+          onContainerLayoutDimensionChanged.onChanged(containerLayoutList.get(0).getTop(),
+              containerLayoutList.get(0).getBottom());
+          getViewTreeObserver().removeOnGlobalLayoutListener(this);
+          
+        }
       }
     });
   }
@@ -199,16 +260,28 @@ public class PieChartDataView extends RelativeLayout {
       
       containerLayout.setOrientation(LinearLayout.HORIZONTAL);
       containerLayout.setGravity(Gravity.CENTER_VERTICAL);
-      containerLayout.setPadding(containerLPaddingLeft, 0, containerLPaddingRight, 0);
+      containerLayout.setPadding(
+          containerLayout.getPaddingLeft() + selectorOverage,
+          containerLayout.getPaddingTop(),
+          containerLayout.getPaddingRight() + selectorOverage,
+          containerLayout.getPaddingBottom());
     
       titleTV.setTextColor(textColor);
       titleTV.setTextSize(textSize);
       titleTV.setText(pieChartValues.get(i).getTitle() + " (" + pieChartValues.get(i).getValue() + ")");
-      titleTV.setPadding(textPaddingLeft, 0, 0, 0);
+  
+      if (colorBoxPosition == ColorBoxPosition.LEFT) {
+        titleTV.setPadding(titleTV.getPaddingLeft() + distanceBetweenColorBoxAndText, titleTV.getPaddingTop(),
+            titleTV.getPaddingLeft(), titleTV.getPaddingBottom());
+        containerLayout.addView(colorBox);
+        containerLayout.addView(titleTV);
+      } else if (colorBoxPosition == ColorBoxPosition.RIGHT) {
+        titleTV.setPadding(titleTV.getPaddingLeft(), titleTV.getPaddingTop(),
+            titleTV.getPaddingLeft() + distanceBetweenColorBoxAndText, titleTV.getPaddingBottom());
+        containerLayout.addView(titleTV);
+        containerLayout.addView(colorBox);
+      }
       
-      
-      containerLayout.addView(colorBox);
-      containerLayout.addView(titleTV);
       mainContainer.addView(containerLayout);
       containerLayoutList.add((LinearLayout) mainContainer.getChildAt(i));
   
@@ -226,25 +299,18 @@ public class PieChartDataView extends RelativeLayout {
     mainContainer.setLayoutParams(mainContainerLP);
     mainContainer.setOrientation(LinearLayout.VERTICAL);
   
-    calibrateSelector();
   }
   
-  @Override
-  protected void onFinishInflate() {
-    super.onFinishInflate();
-  }
-  
-  @Override
-  protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-    super.onSizeChanged(w, h, oldw, oldh);
-  }
-  
-  private void calibrateSelector() {
+  private void calibrateSelector(int top, int bottom) {
     selector.setLayoutParams(new LayoutParams(
         LayoutParams.MATCH_PARENT, 0));
-    selector.setTop(0);
-    selector.setBottom(0);
+    selector.setTop(top + getPaddingTop());
+    selector.setBottom(bottom + getPaddingTop());
     selector.setBackgroundColor(selectorColor);
+  }
+  
+  public PieChartView getPieChartView() {
+    return pieChartView;
   }
   
   public PieChartDataView bindTo(PieChartView pieChartView) {
@@ -259,6 +325,51 @@ public class PieChartDataView extends RelativeLayout {
       }
     });
     return this;
+  }
+  
+  private void setAttrs() {
+    textColor = typedArray.getColor(R.styleable.PieChartDataView_textColor, textColor);
+    
+    float textSizeSp = typedArray.getDimension(R.styleable.PieChartDataView_textSize, textSize);
+    
+    textSize = Calc.spToPx(context, textSizeSp);
+    
+    selectorColor = typedArray.getColor(R.styleable.PieChartDataView_selectorColor, selectorColor);
+    
+    float selectorOverageDp = typedArray.getDimension(
+        R.styleable.PieChartDataView_selectorOverage, selectorOverage);
+    
+    selectorOverage = Calc.dpToPx(context, selectorOverageDp);
+    
+    float colorBoxDimensionDp = typedArray.getDimension(
+        R.styleable.PieChartDataView_colorBoxDimension, colorBoxDimension);
+    
+    colorBoxDimension = Calc.dpToPx(context, colorBoxDimensionDp);
+    
+    float distanceBetweenColorBoxAndTextDp = typedArray.getDimension(
+        R.styleable.PieChartDataView_distanceBetweenColorBoxAndText, distanceBetweenColorBoxAndText);
+  
+    distanceBetweenColorBoxAndText = Calc.dpToPx(context, distanceBetweenColorBoxAndText);
+    
+    colorBoxShape = ColorBoxShape.fromId(
+        typedArray.getInt(R.styleable.PieChartDataView_colorBoxShape, 1));
+    
+    colorBoxPosition = ColorBoxPosition.fromId(
+        typedArray.getInt(R.styleable.PieChartDataView_colorBoxPosition, 0));
+    
+    typedArray.recycle();
+  }
+  
+  private interface OnContainerLayoutDimensionChanged {
+    void onChanged(int top, int bottom);
+  }
+  
+  private void setOnContainerLayoutDimensionChanged(OnContainerLayoutDimensionChanged onChanged) {
+    this.onContainerLayoutDimensionChanged = onChanged;
+  }
+  
+  private void setContainerLayoutDimension(int top, int bottom) {
+    this.onContainerLayoutDimensionChanged.onChanged(top, bottom);
   }
   
   public PieChartDataView setData(ArrayList<PieChartData> pieChartValues) {
@@ -302,6 +413,10 @@ public class PieChartDataView extends RelativeLayout {
     return this;
   }
   
+  public ColorBoxShape getColorBoxShape() {
+    return colorBoxShape;
+  }
+  
   public PieChartDataView setColorBoxShape(ColorBoxShape shape) {
     this.colorBoxShape = shape;
     return this;
@@ -325,14 +440,39 @@ public class PieChartDataView extends RelativeLayout {
     return this;
   }
   
+  public int getSelectorOverage() {
+    return selectorOverage;
+  }
+  
   public PieChartDataView makeSelectorLonger(int px) {
-    containerLPaddingLeft = px;
-    containerLPaddingRight = px;
+    selectorOverage = px;
     return this;
   }
   
+  public int getDistanceBetweenColorBoxAndText() {
+    return distanceBetweenColorBoxAndText;
+  }
+  
   public PieChartDataView setDistanceBetweenColorBoxAndText(int px) {
-    textPaddingLeft = px;
+    distanceBetweenColorBoxAndText = px;
+    return this;
+  }
+  
+  public ColorBoxPosition getColorBoxPosition() {
+    return colorBoxPosition;
+  }
+  
+  public PieChartDataView setColorBoxPosition(ColorBoxPosition colorBoxPosition) {
+    this.colorBoxPosition = colorBoxPosition;
+    return this;
+  }
+  
+  public int getSelectedSegment() {
+    return selectedSegment;
+  }
+  
+  public PieChartDataView setSelectedSegment(int selectedSegment) {
+    this.selectedSegment = selectedSegment;
     return this;
   }
 }

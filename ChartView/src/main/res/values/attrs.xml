@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="GlobalAttrs" >
+        <attr name="centerCircleColor" format="color|reference" />
+        <attr name="percentageTextColor" format="color|reference" />
+        <attr name="percentageTextSize" format="dimension|reference" />
+        <attr name="apartDistance" format="dimension|reference" />
+        <attr name="startAngle" format="integer|reference" />
+
+        <attr name="textColor" format="color|reference" />
+        <attr name="textSize" format="dimension|reference" />
+        <attr name="selectorColor" format="color|reference" />
+        <attr name="selectorOverage" format="dimension|reference" />
+        <attr name="colorBoxDimension" format="dimension|reference" />
+        <attr name="distanceBetweenColorBoxAndText" format="dimension|reference" />
+        <attr name="colorBoxShape">
+            <enum name="RECT" value="0" />
+            <enum name="CIRCLE" value="1" />
+            <enum name="TRIANGLE_UP" value="2" />
+            <enum name="TRIANGLE_RIGHT" value="3" />
+            <enum name="TRIANGLE_DOWN" value="4" />
+            <enum name="TRIANGLE_LEFT" value="5" />
+        </attr>
+        <attr name="colorBoxPosition">
+            <enum name="LEFT" value="0" />
+            <enum name="RIGHT" value="1" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="PieChartView">
+        <attr name="centerCircleColor" />
+        <attr name="percentageTextColor" />
+        <attr name="percentageTextSize" />
+        <attr name="apartDistance" />
+        <attr name="startAngle" />
+    </declare-styleable>
+
+    <declare-styleable name="PieChartDataView">
+        <attr name="textColor" />
+        <attr name="textSize" />
+        <attr name="selectorColor" />
+        <attr name="selectorOverage" />
+        <attr name="colorBoxDimension" />
+        <attr name="distanceBetweenColorBoxAndText" />
+        <attr name="colorBoxShape" />
+        <attr name="colorBoxPosition" />
+    </declare-styleable>
+</resources>

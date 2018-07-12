@@ -2,6 +2,7 @@ package volkanatalan.chartview.charts;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -19,15 +20,17 @@ import java.util.ArrayList;
 
 public class PieChartView extends View {
   
-  private int textSize = 30;
+  Context context;
+  private TypedArray typedArray;
   private int apartDistance = 10;
   private int selectedSegment = 0;
-  private int textColor = Color.BLACK;
-  private int middleCircleColor = Color.WHITE;
+  private int percentageTextSize = 30;
+  private int percentageTextColor = Color.BLACK;
+  private int centerCircleColor = Color.WHITE;
   private int[] colorList = getContext().getResources().getIntArray(R.array.pie_chart_color_list);
   private float radius, xCenter, yCenter;
   private float startAngle = 270;
-  private Paint paintSegment, paintText, paintMiddleCircle;
+  private Paint paintSegment, paintText, paintCenterCircle;
   private RectF selectedArcRect, unselectedArcRect;
   private ArrayList<PieChartData> data;
   private LockableScrollView lockableScrollView;
@@ -35,6 +38,7 @@ public class PieChartView extends View {
   
   public PieChartView(Context context) {
     super(context);
+    this.context = context;
     start();
     if (isInEditMode()) {
       editModeDisplay();
@@ -43,6 +47,8 @@ public class PieChartView extends View {
   
   public PieChartView(Context context, AttributeSet attrs) {
     super(context, attrs);
+    this.context = context;
+    this.typedArray = context.obtainStyledAttributes(attrs, R.styleable.PieChartView);
     start();
     if (isInEditMode()) {
       editModeDisplay();
@@ -51,6 +57,8 @@ public class PieChartView extends View {
   
   public PieChartView(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
+    this.context = context;
+    this.typedArray = context.obtainStyledAttributes(attrs, R.styleable.PieChartView, defStyleAttr, 0);
     start();
     if (isInEditMode()) {
       editModeDisplay();
@@ -69,19 +77,16 @@ public class PieChartView extends View {
         .draw();
   }
   
-  public interface SelectedSegmentChangeListener {
-    void onChange(int position);
-  }
-  
   @SuppressLint("ClickableViewAccessibility")
   private void start() {
+    setAttrs();
     paintSegment = new Paint(Paint.ANTI_ALIAS_FLAG);
     paintSegment.setStyle(Paint.Style.FILL);
     paintSegment.setDither(true);
   
-    paintMiddleCircle = new Paint(Paint.ANTI_ALIAS_FLAG);
-    paintMiddleCircle.setStyle(Paint.Style.FILL);
-    paintMiddleCircle.setDither(true);
+    paintCenterCircle = new Paint(Paint.ANTI_ALIAS_FLAG);
+    paintCenterCircle.setStyle(Paint.Style.FILL);
+    paintCenterCircle.setDither(true);
   
     paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
     paintText.setDither(true);
@@ -246,10 +251,10 @@ public class PieChartView extends View {
   protected void onDraw(Canvas canvas) {
     if (data != null) {
       if (data.size() > 0) {
-        paintText.setColor(textColor);
-        paintText.setTextSize(textSize);
+        paintText.setColor(percentageTextColor);
+        paintText.setTextSize(percentageTextSize);
         
-        paintMiddleCircle.setColor(middleCircleColor);
+        paintCenterCircle.setColor(centerCircleColor);
         
         // Set the selected circle segment's color
         if (data.get(selectedSegment).getColor() == 0)
@@ -268,9 +273,9 @@ public class PieChartView extends View {
             data.get(selectedSegment).getDrawingDegree(),
             true, paintSegment);
   
-        paintSegment.setColor(middleCircleColor);
+        paintSegment.setColor(centerCircleColor);
         canvas.drawCircle(xCenter + (float) Math.cos(middleAng) * apartDistance,
-            yCenter + (float) Math.sin(middleAng) * apartDistance, radius / 2, paintMiddleCircle);
+            yCenter + (float) Math.sin(middleAng) * apartDistance, radius / 2, paintCenterCircle);
         
         // Draw other circle segments
         for (int i = 0; i < data.size(); i++) {
@@ -292,11 +297,33 @@ public class PieChartView extends View {
         }
         
         // Make hole
-        canvas.drawCircle(xCenter, yCenter, radius / 2, paintMiddleCircle);
+        canvas.drawCircle(xCenter, yCenter, radius / 2, paintCenterCircle);
         
         canvas.drawText(Calc.round(data.get(selectedSegment).getPercentage(), 1) + "%",
-            xCenter, yCenter + textSize / 3, paintText);
+            xCenter, yCenter + percentageTextSize / 3, paintText);
       }
+    }
+  }
+  
+  private void setAttrs() {
+    if (typedArray != null) {
+      centerCircleColor = typedArray.getColor(R.styleable.PieChartView_centerCircleColor, centerCircleColor);
+      
+      percentageTextColor = typedArray.getColor(R.styleable.PieChartView_percentageTextColor, percentageTextColor);
+      
+      float percentageTextSizeSp = typedArray.getDimension(R.styleable.PieChartView_percentageTextSize, percentageTextSize);
+      
+      percentageTextSize = Calc.spToPx(context, percentageTextSizeSp);
+      
+      float apartDistanceDp = typedArray.getDimension(R.styleable.PieChartView_apartDistance, apartDistance);
+  
+      apartDistance = Calc.dpToPx(context, apartDistanceDp);
+      
+      startAngle = typedArray.getInt(R.styleable.PieChartView_startAngle, (int) startAngle);
+      
+      startAngle = startAngle % 360;
+      
+      typedArray.recycle();
     }
   }
   
@@ -323,25 +350,25 @@ public class PieChartView extends View {
   }
   
   public int getPercentageTextSize() {
-    return textSize;
+    return percentageTextSize;
   }
   
   public PieChartView setPercentageTextSize(int textSize) {
-    this.textSize = textSize;
+    this.percentageTextSize = textSize;
     return this;
   }
   
   public int getPercentageTextColor() {
-    return textColor;
+    return percentageTextColor;
   }
   
   public PieChartView setPercentageTextColor(int textColor) {
-    this.textColor = textColor;
+    this.percentageTextColor = textColor;
     return this;
   }
   
-  public PieChartView setMiddleCircleColor(int middleCircleColor) {
-    this.middleCircleColor = middleCircleColor;
+  public PieChartView setCenterCircleColor(int centerCircleColor) {
+    this.centerCircleColor = centerCircleColor;
     return this;
   }
   
@@ -359,6 +386,10 @@ public class PieChartView extends View {
   
   public int getSelectedSegment() {
     return selectedSegment;
+  }
+  
+  public interface SelectedSegmentChangeListener {
+    void onChange(int position);
   }
   
   public PieChartView setSelectedSegment(int selectedSegment) {
@@ -379,5 +410,14 @@ public class PieChartView extends View {
   
   public void setSelectedSegmentChangeListener(SelectedSegmentChangeListener listener) {
     this.selectedSegmentChangeListener = listener;
+  }
+  
+  public int getApartDistance() {
+    return apartDistance;
+  }
+  
+  public PieChartView setApartDistance(int apartDistance) {
+    this.apartDistance = apartDistance;
+    return this;
   }
 }

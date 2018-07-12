@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -18,14 +19,25 @@
             android:id="@+id/pieChartView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="30dp" />
+            android:padding="30dp"
+            app:centerCircleColor="@color/spaceGray"
+            app:percentageTextColor="@color/white"
+            app:percentageTextSize="50sp"
+            app:apartDistance="10dp" />
 
         <volkanatalan.chartview.data_views.PieChartDataView
             android:id="@+id/pieChartValueView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:layout_marginTop="30dp"/>
+            android:layout_marginTop="30dp"
+            app:textColor="@color/white"
+            app:textSize="30sp"
+            app:selectorOverage="50dp"
+            app:colorBoxDimension="10dp"
+            app:distanceBetweenColorBoxAndText="10dp"
+            app:colorBoxShape="CIRCLE"
+            app:colorBoxPosition="LEFT" />
 
     </LinearLayout>
 
