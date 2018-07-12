@@ -2,7 +2,9 @@
 ![ChartViewProject](https://github.com/thehorsebuyer/ChartViewProject/blob/master/images/ChartViewProjectSS.png)
 
 <br>
-ChartViewProject is an unfinished project which contains a pie chart for now. But in the future other chart types will be added. The charts in this project will be interactive, animated and good-looking.
+ChartViewProject is an unfinished project which contains a pie chart for now. But in the future other chart types will be added. The charts in this project will be interactive, animated and good-looking. <br>
+
+:point_right:[Watch usage video](https://youtu.be/-3yu9N0Ysa8)
 
 ## Views in this project
 1- PieChartView<br>
