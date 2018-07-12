@@ -1,4 +1,4 @@
-# ChartViewProject
+# :star: ChartViewProject :star:
 ![ChartViewProject](https://github.com/thehorsebuyer/ChartViewProject/blob/master/images/ChartViewProjectSS.png)
 
 <br>
@@ -9,6 +9,9 @@ ChartViewProject is an unfinished project which contains a pie chart for now. Bu
 2- PieChartDataView
 
 ### 1- PieChartView
+
+![PieChartView](https://github.com/thehorsebuyer/ChartViewProject/blob/master/images/PieChartView.jpg)
+
 With this view you can add a pie chart to your project. PieChartView is interactable. When you touch a segment of the chart, the segment comes apart and the percentage of the the segment is written on the center of the chart. PieChartView is customizable. You can define your own color set to it, you can change its starting angle and etc.
 
 ### Usage
@@ -51,9 +54,12 @@ pieChartView.setData(pieChartData)
     .setColorList(getContext().getResources().getIntArray(R.array.color_list))
     .draw();
 ```
-You have to call `draw()` method if you make changes programmatically.
+> :exclamation: You have to call `draw()` method if you make changes programmatically.
 
 ### 2- PieChartDataView
+
+![PieChartDataView](https://github.com/thehorsebuyer/ChartViewProject/blob/master/images/PieChartDataView.jpg)
+
 With this view you can show the data of your PieChartView. It shows the color of the item in the PieChartView, item name and item amount. PieChartDataView is interactable. If you touch any segment of the PieChartView, required item of the PieChartDataView gets selected.In the same way, if you touch any item of the PieChartDataView, that item gets selected and required segment of the PieChartView comes apart. PieChartDataView is also customizable. You can change the selector color, set the color box shape as square, circle and triangle, and etc.
 
 ### Usage
@@ -72,7 +78,7 @@ pieChartDataView.setData(pieChartData)
     .bindTo(pieChartView)
     .draw();
 ```
-`.draw()` method always have to be called.<br><br>
+> :exclamation: `.draw()` method always have to be called.<br><br>
 
 **If you need more customization:**
 
