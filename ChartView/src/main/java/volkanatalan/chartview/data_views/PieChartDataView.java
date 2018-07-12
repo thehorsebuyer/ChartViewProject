@@ -1,7 +1,6 @@
 package volkanatalan.chartview.data_views;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -11,11 +10,8 @@ import android.graphics.Path;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -52,7 +48,7 @@ public class PieChartDataView extends RelativeLayout {
   private ColorBoxPosition colorBoxPosition = ColorBoxPosition.LEFT;
   
   public enum ColorBoxShape {
-    RECT(0), CIRCLE(1), TRIANGLE_UP(2), TRIANGLE_RIGHT(3), TRIANGLE_DOWN(4), TRIANGLE_LEFT(5);
+    SQUARE(0), CIRCLE(1), TRIANGLE_UP(2), TRIANGLE_RIGHT(3), TRIANGLE_DOWN(4), TRIANGLE_LEFT(5);
     int id;
   
     ColorBoxShape(int id) {
@@ -219,7 +215,7 @@ public class PieChartDataView extends RelativeLayout {
             canvas.drawCircle(canvas.getWidth() / 2, canvas.getHeight() / 2,
                 canvas.getHeight() / 2, colorBoxPaint);
         
-          } else if (colorBoxShape == ColorBoxShape.RECT) {
+          } else if (colorBoxShape == ColorBoxShape.SQUARE) {
             canvas.drawPaint(colorBoxPaint);
         
           } else if (colorBoxShape == ColorBoxShape.TRIANGLE_UP) {
@@ -444,7 +440,7 @@ public class PieChartDataView extends RelativeLayout {
     return selectorOverage;
   }
   
-  public PieChartDataView makeSelectorLonger(int px) {
+  public PieChartDataView setSelectorOverage(int px) {
     selectorOverage = px;
     return this;
   }

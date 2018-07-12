@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--Designed to run in 7"WSVGA (Tablet)-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -23,18 +24,19 @@
             app:centerCircleColor="@color/spaceGray"
             app:percentageTextColor="@color/white"
             app:percentageTextSize="50sp"
-            app:apartDistance="10dp" />
+            app:apartDistance="10dp"
+            app:startAngle="270" />
 
         <volkanatalan.chartview.data_views.PieChartDataView
-            android:id="@+id/pieChartValueView"
+            android:id="@+id/pieChartDataView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:layout_marginTop="30dp"
             app:textColor="@color/white"
-            app:textSize="30sp"
+            app:textSize="40sp"
             app:selectorOverage="50dp"
-            app:colorBoxDimension="10dp"
+            app:colorBoxDimension="15dp"
             app:distanceBetweenColorBoxAndText="10dp"
             app:colorBoxShape="CIRCLE"
             app:colorBoxPosition="LEFT" />

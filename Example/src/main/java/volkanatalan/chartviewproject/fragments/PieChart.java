@@ -45,13 +45,20 @@ public class PieChart extends Fragment {
     View v = inflater.inflate(R.layout.fragment_pie_chart, container, false);
     FrameLayout root = v.findViewById(R.id.root);
     pieChartView = v.findViewById(R.id.pieChartView);
-    pieChartDataView = v.findViewById(R.id.pieChartValueView);
-    
-    pieChartView.setData(pieChartData)
-        .draw(); // or .invalidate();
+    pieChartDataView = v.findViewById(R.id.pieChartDataView);
+  
+    pieChartView.setData(pieChartData);
     
     pieChartDataView.setData(pieChartData)
         .bindTo(pieChartView)
+        .setTextColor(Color.WHITE)
+        .setTextSize(40)
+        .setSelectorColor(getContext().getResources().getColor(R.color.selector_color))
+        .setColorBoxShape(PieChartDataView.ColorBoxShape.SQUARE)
+        .setColorBoxDimension(15)
+        .setColorBoxPosition(PieChartDataView.ColorBoxPosition.LEFT)
+        .setSelectorOverage(50)
+        .setDistanceBetweenColorBoxAndText(10)
         .draw();
     
     root.setOnClickListener(new View.OnClickListener() {

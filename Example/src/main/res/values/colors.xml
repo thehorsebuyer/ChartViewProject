@@ -3,5 +3,30 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
     <color name="spaceGray">#343d46</color>
+    <color name="red">#ff0000</color>
+    <color name="orange">#ff6d00</color>
+    <color name="yellow">#ffff00</color>
+    <color name="green">#00ff00</color>
+    <color name="blue">#0000ff</color>
+    <color name="purple">#7c19b9</color>
+    <color name="magenta">#ff00ff</color>
+    <color name="pink">#ff69b4</color>
+    <color name="cyan">#00ffff</color>
+    <color name="gray">#d3d3d3 </color>
+
+    <array name="color_list">
+        <item>@color/red</item>
+        <item>@color/orange</item>
+        <item>@color/yellow</item>
+        <item>@color/green</item>
+        <item>@color/blue</item>
+        <item>@color/purple</item>
+        <item>@color/magenta</item>
+        <item>@color/pink</item>
+        <item>@color/cyan</item>
+        <item>@color/gray</item>
+
+    </array>
 </resources>
