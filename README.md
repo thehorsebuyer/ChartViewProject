@@ -22,8 +22,9 @@ With this view you can add a pie chart to your project. PieChartView is interact
 PieChartView pieChartView = findViewById(R.id.pieChartView);
 pieChartView.setData(pieChartData);
 ```
+<br>
 
-If you need more costomization:
+**If you need more customization:**
 
 ```XML
 <volkanatalan.chartview.charts.PieChartView
@@ -70,7 +71,7 @@ pieChartDataView.setData(pieChartData)
 ```
 `.draw()` method always have to be called.<br><br>
 
-If you need more costomization:
+**If you need more customization:**
 
 ```XML
 <volkanatalan.chartview.data_views.PieChartDataView
@@ -99,3 +100,5 @@ pieChartDataView.setData(pieChartData)
     .setDistanceBetweenColorBoxAndText(10)
     .draw();
 ```
+ColorBoxShape enums: **SQUARE**, **CIRCLE**, **TRIANGLE_UP**, **TRIANGLE_RIGHT**, **TRIANGLE_DOWN**, **TRIANGLE_LEFT**
+ColorBoxPosition enums: **LEFT**, **RIGHT**
