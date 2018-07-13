@@ -48,9 +48,7 @@ public class PieChart extends Fragment {
   
     pieChartView.setData(pieChartData);
     
-    pieChartDataView.setData(pieChartData)
-        .bindTo(pieChartView)
-        .draw();
+    pieChartDataView.bindTo(pieChartView);
     
     root.setOnClickListener(new View.OnClickListener() {
       @Override

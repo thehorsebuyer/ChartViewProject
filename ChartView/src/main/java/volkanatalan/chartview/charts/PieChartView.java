@@ -34,7 +34,8 @@ public class PieChartView extends View {
   private RectF selectedArcRect, unselectedArcRect;
   private ArrayList<PieChartData> data;
   private LockableScrollView lockableScrollView;
-  private SelectedSegmentChangeListener selectedSegmentChangeListener;
+  private SelectedSegmentListener selectedSegmentListener;
+  private DataListener dataListener;
   
   public PieChartView(Context context) {
     super(context);
@@ -337,6 +338,8 @@ public class PieChartView extends View {
   
   public PieChartView setData(ArrayList<PieChartData> data) {
     this.data = data;
+    if (dataListener != null)
+      dataListener.onChange(data);
     return this;
   }
   
@@ -388,14 +391,10 @@ public class PieChartView extends View {
     return selectedSegment;
   }
   
-  public interface SelectedSegmentChangeListener {
-    void onChange(int position);
-  }
-  
   public PieChartView setSelectedSegment(int selectedSegment) {
     this.selectedSegment = selectedSegment;
-    if (selectedSegmentChangeListener != null)
-      selectedSegmentChangeListener.onChange(selectedSegment);
+    if (selectedSegmentListener != null)
+      selectedSegmentListener.onChange(selectedSegment);
     return this;
   }
   
@@ -404,12 +403,28 @@ public class PieChartView extends View {
     return this;
   }
   
-  public SelectedSegmentChangeListener getSelectedSegmentChangeListener() {
-    return selectedSegmentChangeListener;
+  public interface SelectedSegmentListener {
+    void onChange(int position);
   }
   
-  public void setSelectedSegmentChangeListener(SelectedSegmentChangeListener listener) {
-    this.selectedSegmentChangeListener = listener;
+  public SelectedSegmentListener getSelectedSegmentListener() {
+    return selectedSegmentListener;
+  }
+  
+  public void setSelectedSegmentListener(SelectedSegmentListener listener) {
+    this.selectedSegmentListener = listener;
+  }
+  
+  public interface DataListener{
+    void onChange(ArrayList<PieChartData> pieChartData);
+  }
+  
+  public void setDataListener(DataListener dataListener) {
+    this.dataListener = dataListener;
+  }
+  
+  public DataListener getDataListener() {
+    return dataListener;
   }
   
   public int getApartDistance() {
