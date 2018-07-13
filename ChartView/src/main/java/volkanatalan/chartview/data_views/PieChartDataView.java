@@ -33,7 +33,6 @@ public class PieChartDataView extends RelativeLayout {
   private ArrayList<PieChartData> pieChartValues;
   private ArrayList<LinearLayout> containerLayoutList = new ArrayList<>();
   private PieChartView pieChartView;
-  private OnContainerLayoutDimensionChanged onContainerLayoutDimensionChanged;
   
   private int textColor = Color.BLACK;
   private int textSize = 14;
@@ -84,9 +83,6 @@ public class PieChartDataView extends RelativeLayout {
     super(context);
     this.context = context;
     init();
-    if (isInEditMode()) {
-      editModeDisplay();
-    }
   }
   
   public PieChartDataView(Context context, @Nullable AttributeSet attrs) {
@@ -94,9 +90,6 @@ public class PieChartDataView extends RelativeLayout {
     this.context = context;
     this.typedArray = context.obtainStyledAttributes(attrs, R.styleable.PieChartDataView);
     init();
-    if (isInEditMode()) {
-      editModeDisplay();
-    }
   }
   
   public PieChartDataView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -104,9 +97,6 @@ public class PieChartDataView extends RelativeLayout {
     this.context = context;
     this.typedArray = context.obtainStyledAttributes(attrs, R.styleable.PieChartDataView, defStyleAttr, 0);
     init();
-    if (isInEditMode()) {
-      editModeDisplay();
-    }
   }
   
   private void editModeDisplay() {
@@ -124,26 +114,51 @@ public class PieChartDataView extends RelativeLayout {
   }
   
   private void init() {
-  
-    getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-      @Override
-      public void onGlobalLayout() {
-        // Fetch data
-        if (pieChartValues == null && pieChartView != null) {
-          pieChartValues = pieChartView.getData();
-          
-          start();
-          draw();
-          
-          getViewTreeObserver().removeOnGlobalLayoutListener(this);
+    if (isInEditMode()) {
+      editModeDisplay();
+      start();
+      draw();
+    } else {
+      getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        @Override
+        public void onGlobalLayout() {
+          // Fetch data
+          if (pieChartValues == null && pieChartView != null) {
+            pieChartValues = pieChartView.getData();
+        
+            start();
+            draw();
+        
+            getViewTreeObserver().removeOnGlobalLayoutListener(this);
+          }
         }
-      }
-    });
+      });
+    }
   }
   
   @SuppressLint("ClickableViewAccessibility")
   private void start() {
+  }
+  
+  @Override
+  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    widthMeasureMode = MeasureSpec.getMode(widthMeasureSpec);
+  }
+  
+  @SuppressLint("SetTextI18n")
+  public void draw() {
     setAttrs();
+    
+    selector = new RelativeLayout(context);
+    mainContainer = new LinearLayout(context);
+    
+    LayoutParams mainContainerLP = new LayoutParams(
+        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+    mainContainerLP.addRule(CENTER_HORIZONTAL);
+    mainContainer.setLayoutParams(mainContainerLP);
+    mainContainer.setOrientation(LinearLayout.VERTICAL);
+  
     OnTouchListener onTouchListener = new OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -161,51 +176,8 @@ public class PieChartDataView extends RelativeLayout {
         return true;
       }
     };
-    
-    setOnContainerLayoutDimensionChanged(new OnContainerLayoutDimensionChanged() {
-      @Override
-      public void onChanged(int top, int bottom) {
-        calibrateSelector(top, bottom);
-        selector.requestLayout();
-      }
-    });
-    
+  
     setOnTouchListener(onTouchListener);
-    
-    getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-      @Override
-      public void onGlobalLayout() {
-        // Set layout parameters of PieChartDataView. If width is wrap_content, wrap mainContainer.
-        // Without this PieChartDataView wraps selector.
-        if (containerLayoutList.size() == pieChartValues.size()) {
-          if (containerLayoutList.get(0).getTop() > 0 || containerLayoutList.get(0).getBottom() > 0) {
-      
-            onContainerLayoutDimensionChanged.onChanged(containerLayoutList.get(0).getTop(),
-                containerLayoutList.get(0).getBottom());
-      
-            if (widthMeasureMode == MeasureSpec.AT_MOST) {
-              setLayoutParams(new LinearLayout.LayoutParams(
-                  mainContainer.getWidth() + getPaddingRight() + getPaddingLeft(), getHeight()));
-            }
-            
-            getViewTreeObserver().removeOnGlobalLayoutListener(this);
-          }
-        }
-    
-      }
-    });
-  }
-  
-  @Override
-  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    widthMeasureMode = MeasureSpec.getMode(widthMeasureSpec);
-  }
-  
-  @SuppressLint("SetTextI18n")
-  public void draw() {
-    selector = new RelativeLayout(context);
-    mainContainer = new LinearLayout(context);
     
     for (int i = 0; i < pieChartValues.size(); i++) {
       final int pos = i;
@@ -289,6 +261,7 @@ public class PieChartDataView extends RelativeLayout {
             titleTV.getPaddingLeft(), titleTV.getPaddingBottom());
         containerLayout.addView(colorBox);
         containerLayout.addView(titleTV);
+        
       } else if (colorBoxPosition == ColorBoxPosition.RIGHT) {
         titleTV.setPadding(titleTV.getPaddingLeft(), titleTV.getPaddingTop(),
             titleTV.getPaddingLeft() + distanceBetweenColorBoxAndText, titleTV.getPaddingBottom());
@@ -298,28 +271,37 @@ public class PieChartDataView extends RelativeLayout {
   
       mainContainer.addView(containerLayout);
       containerLayoutList.add((LinearLayout) mainContainer.getChildAt(i));
-  
-      if (i == selectedSegment) {
-    
-      }
     }
 
     this.addView(selector);
     this.addView(mainContainer);
-
-    LayoutParams mainContainerLP = new LayoutParams(
-        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-    mainContainerLP.addRule(CENTER_HORIZONTAL);
-    mainContainer.setLayoutParams(mainContainerLP);
-    mainContainer.setOrientation(LinearLayout.VERTICAL);
   
+    getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+      @Override
+      public void onGlobalLayout() {
+        if (mainContainer.getWidth() > 0) {
+          if (widthMeasureMode == MeasureSpec.AT_MOST) {
+            setLayoutParams(new LinearLayout.LayoutParams(
+                mainContainer.getWidth() + getPaddingRight() + getPaddingLeft(), getHeight()));
+          }
+  
+          calibrateSelector(containerLayoutList.get(0).getTop(),
+              containerLayoutList.get(0).getBottom());
+          selector.requestLayout();
+          
+          getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        }
+      }
+    });
   }
   
   private void calibrateSelector(int top, int bottom) {
+    int selectorTop = top + getPaddingTop();
+    int selectorBottom = bottom + getPaddingTop();
     selector.setLayoutParams(new LayoutParams(
-        LayoutParams.MATCH_PARENT, 0));
-    selector.setTop(top + getPaddingTop());
-    selector.setBottom(bottom + getPaddingTop());
+        LayoutParams.MATCH_PARENT, selectorBottom - selectorTop));
+    selector.setTop(selectorTop);
+    selector.setBottom(selectorBottom);
     selector.setBackgroundColor(selectorColor);
   }
   
@@ -380,18 +362,6 @@ public class PieChartDataView extends RelativeLayout {
         typedArray.getInt(R.styleable.PieChartDataView_colorBoxPosition, 0));
     
     typedArray.recycle();
-  }
-  
-  private interface OnContainerLayoutDimensionChanged {
-    void onChanged(int top, int bottom);
-  }
-  
-  private void setOnContainerLayoutDimensionChanged(OnContainerLayoutDimensionChanged onChanged) {
-    this.onContainerLayoutDimensionChanged = onChanged;
-  }
-  
-  private void setContainerLayoutDimension(int top, int bottom) {
-    this.onContainerLayoutDimensionChanged.onChanged(top, bottom);
   }
   
   public PieChartDataView setData(ArrayList<PieChartData> pieChartValues) {

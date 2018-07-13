@@ -41,9 +41,6 @@ public class PieChartView extends View {
     super(context);
     this.context = context;
     start();
-    if (isInEditMode()) {
-      editModeDisplay();
-    }
   }
   
   public PieChartView(Context context, AttributeSet attrs) {
@@ -51,9 +48,6 @@ public class PieChartView extends View {
     this.context = context;
     this.typedArray = context.obtainStyledAttributes(attrs, R.styleable.PieChartView);
     start();
-    if (isInEditMode()) {
-      editModeDisplay();
-    }
   }
   
   public PieChartView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -61,9 +55,6 @@ public class PieChartView extends View {
     this.context = context;
     this.typedArray = context.obtainStyledAttributes(attrs, R.styleable.PieChartView, defStyleAttr, 0);
     start();
-    if (isInEditMode()) {
-      editModeDisplay();
-    }
   }
   
   private void editModeDisplay() {
@@ -79,6 +70,9 @@ public class PieChartView extends View {
   
   @SuppressLint("ClickableViewAccessibility")
   private void start() {
+    if (isInEditMode()) {
+      editModeDisplay();
+    }
     setAttrs();
     paintSegment = new Paint(Paint.ANTI_ALIAS_FLAG);
     paintSegment.setStyle(Paint.Style.FILL);

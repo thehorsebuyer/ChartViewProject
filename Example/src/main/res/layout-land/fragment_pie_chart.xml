@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:textColor="@color/white"
-            app:textSize="40sp"
+            app:textSize="30sp"
             app:selectorOverage="50dp"
             app:colorBoxDimension="15dp"
             app:distanceBetweenColorBoxAndText="10dp"
