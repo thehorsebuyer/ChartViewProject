@@ -74,8 +74,7 @@ public class PieChartView extends View {
     data.add(new PieChartData(200, "Title4"));
     data.add(new PieChartData(100, "Title5"));
     
-    this.setData(data)
-        .draw();
+    this.setData(data);
   }
   
   @SuppressLint("ClickableViewAccessibility")
@@ -328,9 +327,6 @@ public class PieChartView extends View {
     }
   }
   
-  public void draw() {
-    invalidate();
-  }
   
   public ArrayList<PieChartData> getData() {
     return data;
@@ -340,6 +336,7 @@ public class PieChartView extends View {
     this.data = data;
     if (dataListener != null)
       dataListener.onChange(data);
+    invalidate();
     return this;
   }
   
@@ -349,6 +346,7 @@ public class PieChartView extends View {
   
   public PieChartView setColorList(int[] colorList) {
     this.colorList = colorList;
+    invalidate();
     return this;
   }
   
@@ -358,6 +356,7 @@ public class PieChartView extends View {
   
   public PieChartView setPercentageTextSize(int textSize) {
     this.percentageTextSize = textSize;
+    invalidate();
     return this;
   }
   
@@ -367,11 +366,13 @@ public class PieChartView extends View {
   
   public PieChartView setPercentageTextColor(int textColor) {
     this.percentageTextColor = textColor;
+    invalidate();
     return this;
   }
   
   public PieChartView setCenterCircleColor(int centerCircleColor) {
     this.centerCircleColor = centerCircleColor;
+    invalidate();
     return this;
   }
   
@@ -395,6 +396,7 @@ public class PieChartView extends View {
     this.selectedSegment = selectedSegment;
     if (selectedSegmentListener != null)
       selectedSegmentListener.onChange(selectedSegment);
+    invalidate();
     return this;
   }
   
@@ -433,6 +435,7 @@ public class PieChartView extends View {
   
   public PieChartView setApartDistance(int apartDistance) {
     this.apartDistance = apartDistance;
+    invalidate();
     return this;
   }
 }
