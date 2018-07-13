@@ -120,7 +120,6 @@ public class PieChartView extends View {
                            data.get(i).getSweepAngleRadian() > touchAngle + 2 * Math.PI))
               {
                 setSelectedSegment(i);
-                invalidate();
               }
             }
             break;
@@ -134,7 +133,6 @@ public class PieChartView extends View {
                          data.get(i).getSweepAngleRadian() > touchAngle + 2 * Math.PI))
             {
               setSelectedSegment(i);
-              invalidate();
             }
           }
         
@@ -394,9 +392,9 @@ public class PieChartView extends View {
   
   public PieChartView setSelectedSegment(int selectedSegment) {
     this.selectedSegment = selectedSegment;
+    invalidate();
     if (selectedSegmentListener != null)
       selectedSegmentListener.onChange(selectedSegment);
-    invalidate();
     return this;
   }
   
