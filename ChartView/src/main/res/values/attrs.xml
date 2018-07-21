@@ -6,6 +6,7 @@
         <attr name="percentageTextSize" format="dimension|reference" />
         <attr name="apartDistance" format="dimension|reference" />
         <attr name="startAngle" format="integer|reference" />
+        <attr name="animationDuration" format="integer|reference" />
 
         <attr name="textColor" format="color|reference" />
         <attr name="textSize" format="dimension|reference" />
@@ -33,6 +34,7 @@
         <attr name="percentageTextSize" />
         <attr name="apartDistance" />
         <attr name="startAngle" />
+        <attr name="animationDuration" />
     </declare-styleable>
 
     <declare-styleable name="PieChartDataView">
