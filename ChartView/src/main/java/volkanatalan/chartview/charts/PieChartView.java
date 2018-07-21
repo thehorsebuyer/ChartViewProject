@@ -1,5 +1,6 @@
 package volkanatalan.chartview.charts;
 
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -23,8 +24,11 @@ public class PieChartView extends View {
   private Context context;
   private TypedArray typedArray;
   private int apartDistance = 10;
+  private float animatedApartDistance = apartDistance;
   private int selectedSegment = 0;
+  private int oldSelectedSegment = selectedSegment;
   private int percentageTextSize = 30;
+  private int animationDuration = 500;
   private int percentageTextColor = Color.BLACK;
   private int centerCircleColor = Color.WHITE;
   private int[] colorList = getContext().getResources().getIntArray(R.array.pie_chart_color_list);
@@ -105,8 +109,10 @@ public class PieChartView extends View {
     
         switch (motionEvent.getAction()) {
           case MotionEvent.ACTION_DOWN:
+            
             if (lockableScrollView != null)
-            lockableScrollView.setScrollingEnabled(false);
+              lockableScrollView.setScrollingEnabled(false);
+            
             for (int i = 0; i < data.size(); i++) {
               if ((data.get(i).getStartAngleRadian() < touchAngle &&
                        data.get(i).getSweepAngleRadian() > touchAngle) ||
@@ -256,18 +262,18 @@ public class PieChartView extends View {
         
         // Draw selected circle segment
         double middleAng = data.get(selectedSegment).getMiddleAngleRadian();
-        selectedArcRect.left = xCenter - radius + apartDistance + (float) Math.cos(middleAng) * apartDistance;
-        selectedArcRect.right = xCenter + radius - apartDistance + (float) Math.cos(middleAng) * apartDistance;
-        selectedArcRect.top = yCenter - radius + apartDistance + (float) Math.sin(middleAng) * apartDistance;
-        selectedArcRect.bottom = yCenter + radius - apartDistance + (float) Math.sin(middleAng) * apartDistance;
+        selectedArcRect.left = xCenter - radius + animatedApartDistance + (float) Math.cos(middleAng) * animatedApartDistance;
+        selectedArcRect.right = xCenter + radius - animatedApartDistance + (float) Math.cos(middleAng) * animatedApartDistance;
+        selectedArcRect.top = yCenter - radius + animatedApartDistance + (float) Math.sin(middleAng) * animatedApartDistance;
+        selectedArcRect.bottom = yCenter + radius - animatedApartDistance + (float) Math.sin(middleAng) * animatedApartDistance;
   
         canvas.drawArc(selectedArcRect, data.get(selectedSegment).getStartAngle(),
             data.get(selectedSegment).getDrawingDegree(),
             true, paintSegment);
   
         paintSegment.setColor(centerCircleColor);
-        canvas.drawCircle(xCenter + (float) Math.cos(middleAng) * apartDistance,
-            yCenter + (float) Math.sin(middleAng) * apartDistance, radius / 2, paintCenterCircle);
+        canvas.drawCircle(xCenter + (float) Math.cos(middleAng) * animatedApartDistance,
+            yCenter + (float) Math.sin(middleAng) * animatedApartDistance, radius / 2, paintCenterCircle);
         
         // Draw other circle segments
         for (int i = 0; i < data.size(); i++) {
@@ -304,16 +310,16 @@ public class PieChartView extends View {
       percentageTextColor = typedArray.getColor(R.styleable.PieChartView_percentageTextColor, percentageTextColor);
       
       float percentageTextSizeSp = typedArray.getDimension(R.styleable.PieChartView_percentageTextSize, percentageTextSize);
-      
       percentageTextSize = Calc.spToPx(context, percentageTextSizeSp);
       
       float apartDistanceDp = typedArray.getDimension(R.styleable.PieChartView_apartDistance, apartDistance);
-  
       apartDistance = Calc.dpToPx(context, apartDistanceDp);
       
       startAngle = typedArray.getInt(R.styleable.PieChartView_startAngle, (int) startAngle);
       
       startAngle = startAngle % 360;
+  
+      animationDuration = typedArray.getInt(R.styleable.PieChartView_animationDuration, animationDuration);
       
       typedArray.recycle();
     }
@@ -385,8 +391,27 @@ public class PieChartView extends View {
   }
   
   public PieChartView setSelectedSegment(int selectedSegment) {
+    // Set selected segment
     this.selectedSegment = selectedSegment;
-    invalidate();
+    
+    // Set animation of selected segment
+    ValueAnimator apartDistanceAnimator = ValueAnimator.ofFloat(0, apartDistance);
+    apartDistanceAnimator.setDuration(animationDuration);
+    apartDistanceAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+      @Override
+      public void onAnimationUpdate(ValueAnimator animation) {
+        animatedApartDistance = (float) animation.getAnimatedValue();
+        invalidate();
+      }
+    });
+    
+    // Animate chart segments
+    if (oldSelectedSegment != selectedSegment) {
+      apartDistanceAnimator.start();
+      oldSelectedSegment = selectedSegment;
+    }
+    
+    // Set selected segment listener
     if (selectedSegmentListener != null)
       selectedSegmentListener.onChange(selectedSegment);
     return this;
@@ -429,5 +454,43 @@ public class PieChartView extends View {
     this.apartDistance = apartDistance;
     invalidate();
     return this;
+  }
+  
+  public float getAnimationDuration () {
+    return animationDuration;
+  }
+  
+  public PieChartView setAnimationDuration(int milliseconds) {
+    animationDuration = milliseconds;
+    invalidate();
+    return this;
+  }
+  
+  public int getCenterCircleColor() {
+    return centerCircleColor;
+  }
+  
+  public float getStartAngle() {
+    return startAngle;
+  }
+  
+  public Paint getPaintSegment() {
+    return paintSegment;
+  }
+  
+  public Paint getPaintText() {
+    return paintText;
+  }
+  
+  public Paint getPaintCenterCircle() {
+    return paintCenterCircle;
+  }
+  
+  public RectF getSelectedArcRect() {
+    return selectedArcRect;
+  }
+  
+  public RectF getUnselectedArcRect() {
+    return unselectedArcRect;
   }
 }
