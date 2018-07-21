@@ -24,7 +24,7 @@ public class PieChartView extends View {
   private Context context;
   private TypedArray typedArray;
   private int apartDistance = 10;
-  private float animatedApartDistance = apartDistance;
+  private float animatedApartDistance;
   private int selectedSegment = 0;
   private int oldSelectedSegment = selectedSegment;
   private int percentageTextSize = 30;
@@ -78,6 +78,9 @@ public class PieChartView extends View {
       editModeDisplay();
     }
     setAttrs();
+  
+    animatedApartDistance = apartDistance;
+    
     paintSegment = new Paint(Paint.ANTI_ALIAS_FLAG);
     paintSegment.setStyle(Paint.Style.FILL);
     paintSegment.setDither(true);
@@ -262,18 +265,25 @@ public class PieChartView extends View {
         
         // Draw selected circle segment
         double middleAng = data.get(selectedSegment).getMiddleAngleRadian();
-        selectedArcRect.left = xCenter - radius + animatedApartDistance + (float) Math.cos(middleAng) * animatedApartDistance;
-        selectedArcRect.right = xCenter + radius - animatedApartDistance + (float) Math.cos(middleAng) * animatedApartDistance;
-        selectedArcRect.top = yCenter - radius + animatedApartDistance + (float) Math.sin(middleAng) * animatedApartDistance;
-        selectedArcRect.bottom = yCenter + radius - animatedApartDistance + (float) Math.sin(middleAng) * animatedApartDistance;
+        selectedArcRect.left = xCenter - radius + (apartDistance - animatedApartDistance) +
+                                   (float) Math.cos(middleAng) * animatedApartDistance;
+        selectedArcRect.right = xCenter + radius - (apartDistance - animatedApartDistance) +
+                                    (float) Math.cos(middleAng) * animatedApartDistance;
+        selectedArcRect.top = yCenter - radius + (apartDistance - animatedApartDistance) +
+                                  (float) Math.sin(middleAng) * animatedApartDistance;
+        selectedArcRect.bottom = yCenter + radius - (apartDistance - animatedApartDistance) +
+                                     (float) Math.sin(middleAng) * animatedApartDistance;
   
         canvas.drawArc(selectedArcRect, data.get(selectedSegment).getStartAngle(),
             data.get(selectedSegment).getDrawingDegree(),
             true, paintSegment);
   
         paintSegment.setColor(centerCircleColor);
+        
+        // Trim selected circle segment
         canvas.drawCircle(xCenter + (float) Math.cos(middleAng) * animatedApartDistance,
-            yCenter + (float) Math.sin(middleAng) * animatedApartDistance, radius / 2, paintCenterCircle);
+            yCenter + (float) Math.sin(middleAng) * animatedApartDistance, radius / 2,
+            paintCenterCircle);
         
         // Draw other circle segments
         for (int i = 0; i < data.size(); i++) {
@@ -294,9 +304,10 @@ public class PieChartView extends View {
           }
         }
         
-        // Make hole
+        // Make a hole
         canvas.drawCircle(xCenter, yCenter, radius / 2, paintCenterCircle);
         
+        // Draw percentage text
         canvas.drawText(Calc.round(data.get(selectedSegment).getPercentage(), 1) + "%",
             xCenter, yCenter + percentageTextSize / 3, paintText);
       }
@@ -305,21 +316,26 @@ public class PieChartView extends View {
   
   private void setAttrs() {
     if (typedArray != null) {
-      centerCircleColor = typedArray.getColor(R.styleable.PieChartView_centerCircleColor, centerCircleColor);
+      centerCircleColor = typedArray.getColor(
+          R.styleable.PieChartView_centerCircleColor, centerCircleColor);
       
-      percentageTextColor = typedArray.getColor(R.styleable.PieChartView_percentageTextColor, percentageTextColor);
+      percentageTextColor = typedArray.getColor(
+          R.styleable.PieChartView_percentageTextColor, percentageTextColor);
       
-      float percentageTextSizeSp = typedArray.getDimension(R.styleable.PieChartView_percentageTextSize, percentageTextSize);
+      float percentageTextSizeSp = typedArray.getDimension(
+          R.styleable.PieChartView_percentageTextSize, percentageTextSize);
       percentageTextSize = Calc.spToPx(context, percentageTextSizeSp);
       
-      float apartDistanceDp = typedArray.getDimension(R.styleable.PieChartView_apartDistance, apartDistance);
+      float apartDistanceDp = typedArray.getDimension(R.styleable.PieChartView_apartDistance,
+          Calc.pxToDp(context, apartDistance));
       apartDistance = Calc.dpToPx(context, apartDistanceDp);
       
       startAngle = typedArray.getInt(R.styleable.PieChartView_startAngle, (int) startAngle);
       
       startAngle = startAngle % 360;
   
-      animationDuration = typedArray.getInt(R.styleable.PieChartView_animationDuration, animationDuration);
+      animationDuration = typedArray.getInt(
+          R.styleable.PieChartView_animationDuration, animationDuration);
       
       typedArray.recycle();
     }
