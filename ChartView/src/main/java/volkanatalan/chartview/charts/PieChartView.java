@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 public class PieChartView extends View {
   
-  Context context;
+  private Context context;
   private TypedArray typedArray;
   private int apartDistance = 10;
   private int selectedSegment = 0;
