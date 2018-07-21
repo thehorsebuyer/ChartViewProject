@@ -83,6 +83,11 @@ public class Calc {
         context.getResources().getDisplayMetrics());
   }
   
+  public static float pxToDp(Context context, int px) {
+    float oneDp = dpToPx(context, 1);
+    return px * oneDp;
+  }
+  
   public static int spToPx(Context context, float sp) {
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp,
         context.getResources().getDisplayMetrics());
