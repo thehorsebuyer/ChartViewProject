@@ -1,5 +1,6 @@
 package volkanatalan.chartview.data_views;
 
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -30,7 +31,8 @@ public class PieChartDataView extends RelativeLayout {
   private int widthMeasureMode;
   private LinearLayout mainContainer;
   private RelativeLayout selector;
-  private ArrayList<PieChartData> pieChartValues;
+  private int selectorOldTop, selectorOldBottom;
+  private ArrayList<PieChartData> pieChartData;
   private ArrayList<LinearLayout> containerLayoutList = new ArrayList<>();
   private PieChartView pieChartView;
   
@@ -42,7 +44,7 @@ public class PieChartDataView extends RelativeLayout {
   private int selectedSegment = 0;
   private int selectorOverage = 0;
   private int distanceBetweenColorBoxAndText = 10;
-  private int[] colorList = getContext().getResources().getIntArray(R.array.pie_chart_color_list);
+  private int animationDuration = 300;
   private ColorBoxShape colorBoxShape = ColorBoxShape.CIRCLE;
   private ColorBoxPosition colorBoxPosition = ColorBoxPosition.LEFT;
   
@@ -123,8 +125,8 @@ public class PieChartDataView extends RelativeLayout {
         @Override
         public void onGlobalLayout() {
           // Fetch data
-          if (pieChartValues == null && pieChartView != null) {
-            pieChartValues = pieChartView.getData();
+          if (pieChartData == null && pieChartView != null) {
+            pieChartData = pieChartView.getData();
         
             start();
             draw();
@@ -165,7 +167,7 @@ public class PieChartDataView extends RelativeLayout {
         switch (motionEvent.getAction()) {
           case MotionEvent.ACTION_DOWN:
             double coordY = motionEvent.getY();
-            for (int i = 0; i < pieChartValues.size(); i++) {
+            for (int i = 0; i < pieChartData.size(); i++) {
               if (coordY > mainContainer.getChildAt(i).getTop() + getPaddingTop()
                       && coordY < mainContainer.getChildAt(i).getBottom() + getPaddingTop()) {
                 pieChartView.setSelectedSegment(i).invalidate();
@@ -179,7 +181,7 @@ public class PieChartDataView extends RelativeLayout {
   
     setOnTouchListener(onTouchListener);
     
-    for (int i = 0; i < pieChartValues.size(); i++) {
+    for (int i = 0; i < pieChartData.size(); i++) {
       final int pos = i;
   
       LinearLayout containerLayout = new LinearLayout(context);
@@ -199,7 +201,7 @@ public class PieChartDataView extends RelativeLayout {
           super.onDraw(canvas);
           colorBoxPaint.setStyle(Paint.Style.FILL);
           colorBoxPaint.setDither(true);
-          colorBoxPaint.setColor(colorList[pos]);
+          colorBoxPaint.setColor(pieChartData.get(pos).getColor());
       
           if (colorBoxShape == ColorBoxShape.CIRCLE) {
             canvas.drawCircle(canvas.getWidth() / 2, canvas.getHeight() / 2,
@@ -254,7 +256,7 @@ public class PieChartDataView extends RelativeLayout {
   
       titleTV.setTextColor(textColor);
       titleTV.setTextSize(textSize);
-      titleTV.setText(pieChartValues.get(i).getTitle() + " (" + pieChartValues.get(i).getValue() + ")");
+      titleTV.setText(pieChartData.get(i).getTitle() + " (" + pieChartData.get(i).getValue() + ")");
   
       if (colorBoxPosition == ColorBoxPosition.LEFT) {
         titleTV.setPadding(titleTV.getPaddingLeft() + distanceBetweenColorBoxAndText, titleTV.getPaddingTop(),
@@ -302,6 +304,8 @@ public class PieChartDataView extends RelativeLayout {
         LayoutParams.MATCH_PARENT, selectorBottom - selectorTop));
     selector.setTop(selectorTop);
     selector.setBottom(selectorBottom);
+    selectorOldTop = selectorTop;
+    selectorOldBottom = selectorBottom;
     selector.setBackgroundColor(selectorColor);
   }
   
@@ -324,8 +328,33 @@ public class PieChartDataView extends RelativeLayout {
       @Override
       public void onChange(int position) {
         selectedSegment = position;
-        selector.setTop(containerLayoutList.get(position).getTop() + getPaddingTop());
-        selector.setBottom(containerLayoutList.get(position).getBottom() + getPaddingTop());
+        int slcTop = containerLayoutList.get(position).getTop() + getPaddingTop();
+        int slcBottom = containerLayoutList.get(position).getBottom() + getPaddingTop();
+  
+        ValueAnimator topAnimator = ValueAnimator.ofInt(selectorOldTop, slcTop);
+        topAnimator.setDuration(animationDuration);
+        topAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+          @Override
+          public void onAnimationUpdate(ValueAnimator valueAnimator) {
+            selector.setTop((int) valueAnimator.getAnimatedValue());
+            selectorOldTop = (int) valueAnimator.getAnimatedValue();
+          }
+        });
+  
+        ValueAnimator bottomAnimator = ValueAnimator.ofInt(selectorOldBottom, slcBottom);
+        bottomAnimator.setDuration(animationDuration);
+        bottomAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+          @Override
+          public void onAnimationUpdate(ValueAnimator valueAnimator) {
+            selector.setBottom((int) valueAnimator.getAnimatedValue());
+            selectorOldBottom = (int) valueAnimator.getAnimatedValue();
+          }
+        });
+        
+        if (selectorOldTop != slcTop || selectorOldBottom != slcBottom) {
+          topAnimator.start();
+          bottomAnimator.start();
+        }
       }
     });
     return this;
@@ -351,21 +380,25 @@ public class PieChartDataView extends RelativeLayout {
     colorBoxDimension = Calc.dpToPx(context, colorBoxDimensionDp);
     
     float distanceBetweenColorBoxAndTextDp = typedArray.getDimension(
-        R.styleable.PieChartDataView_distanceBetweenColorBoxAndText, distanceBetweenColorBoxAndText);
+        R.styleable.PieChartDataView_distanceBetweenColorBoxAndText,
+        Calc.pxToDp(context, distanceBetweenColorBoxAndText));
   
-    distanceBetweenColorBoxAndText = Calc.dpToPx(context, distanceBetweenColorBoxAndText);
+    distanceBetweenColorBoxAndText = Calc.dpToPx(context, distanceBetweenColorBoxAndTextDp);
     
     colorBoxShape = ColorBoxShape.fromId(
         typedArray.getInt(R.styleable.PieChartDataView_colorBoxShape, 1));
     
     colorBoxPosition = ColorBoxPosition.fromId(
         typedArray.getInt(R.styleable.PieChartDataView_colorBoxPosition, 0));
+  
+    animationDuration = typedArray.getInt(
+        R.styleable.PieChartView_animationDuration, animationDuration);
     
     typedArray.recycle();
   }
   
   public PieChartDataView setData(ArrayList<PieChartData> pieChartValues) {
-    this.pieChartValues = pieChartValues;
+    this.pieChartData = pieChartValues;
     return this;
   }
   
@@ -393,15 +426,6 @@ public class PieChartDataView extends RelativeLayout {
   
   public PieChartDataView setSelectorColor(int selectorColor) {
     this.selectorColor = selectorColor;
-    return this;
-  }
-  
-  public int[] getColorList() {
-    return colorList;
-  }
-  
-  public PieChartDataView setColorList(int[] colorList) {
-    this.colorList = colorList;
     return this;
   }
   
@@ -466,5 +490,13 @@ public class PieChartDataView extends RelativeLayout {
   public PieChartDataView setSelectedSegment(int selectedSegment) {
     this.selectedSegment = selectedSegment;
     return this;
+  }
+  
+  public int getAnimationDuration() {
+    return animationDuration;
+  }
+  
+  public void setAnimationDuration(int animationDuration) {
+    this.animationDuration = animationDuration;
   }
 }
