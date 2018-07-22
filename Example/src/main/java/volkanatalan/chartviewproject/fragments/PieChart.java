@@ -30,6 +30,8 @@ public class PieChart extends Fragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    
+    // Create data
     pieChartData = new ArrayList<>();
     pieChartData.add(new PieChartData(815, "Item 1"));
     pieChartData.add(new PieChartData(516, "Item 2"));
@@ -46,8 +48,10 @@ public class PieChart extends Fragment {
     pieChartView = v.findViewById(R.id.pieChartView);
     pieChartDataView = v.findViewById(R.id.pieChartDataView);
   
-    pieChartView.setData(pieChartData);
+    // Set data of PieChartView
+    pieChartView.setPieChartData(pieChartData);
     
+    // Bind PieChartDataView to PieChartView
     pieChartDataView.bindTo(pieChartView);
     
     root.setOnClickListener(new View.OnClickListener() {

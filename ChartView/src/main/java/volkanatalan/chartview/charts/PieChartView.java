@@ -37,7 +37,7 @@ public class PieChartView extends View {
   private float startAngle = 270;
   private Paint paintSegment, paintText, paintCenterCircle;
   private RectF selectedArcRect, unselectedArcRect;
-  private ArrayList<PieChartData> data;
+  private ArrayList<PieChartData> pieChartData;
   private LockableScrollView lockableScrollView;
   private SelectedSegmentListener selectedSegmentListener;
   private DataListener dataListener;
@@ -63,6 +63,7 @@ public class PieChartView extends View {
   }
   
   private void editModeDisplay() {
+    // Create PieChartData list to see the preview of PieChartView.
     ArrayList<PieChartData> data = new ArrayList<>();
     data.add(new PieChartData(500, "Title1"));
     data.add(new PieChartData(400, "Title2"));
@@ -70,7 +71,7 @@ public class PieChartView extends View {
     data.add(new PieChartData(200, "Title4"));
     data.add(new PieChartData(100, "Title5"));
     
-    this.setData(data);
+    this.setPieChartData(data);
   }
   
   @SuppressLint("ClickableViewAccessibility")
@@ -78,9 +79,9 @@ public class PieChartView extends View {
     if (isInEditMode()) {
       editModeDisplay();
     }
+    
+    // Set the attributes of PieChartView.
     setAttrs();
-  
-    animatedApartDistance = apartDistance;
     
     paintSegment = new Paint(Paint.ANTI_ALIAS_FLAG);
     paintSegment.setStyle(Paint.Style.FILL);
@@ -98,15 +99,28 @@ public class PieChartView extends View {
     
     unselectedArcRect = new RectF();
   
+    // Define an OnTouchListener.
     OnTouchListener onTouchListener = new OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
+        // Get the coordinate of the touch point on the x-axis.
         double touchX = motionEvent.getX();
+  
+        // Get the coordinate of the touch point on the y-axis.
         double touchY = motionEvent.getY();
+  
+        // Get the coordinate of the touch point according to center of the x-axis.
+        // coordX can be positive or negative.
         double coordX = touchX - xCenter;
+  
+        // Get the coordinate of the touch point according to center of the y-axis.
+        // coordY can be positive or negative.
         double coordY = touchY - yCenter;
+        
+        // Get the angle of the touch point
         double touchAngle = Math.atan2(coordY, coordX);
     
+        // If touchAngle is negative, make it positive.
         if (touchAngle < 0) {
           touchAngle = 2 * Math.PI + touchAngle;
         }
@@ -114,27 +128,29 @@ public class PieChartView extends View {
         switch (motionEvent.getAction()) {
           case MotionEvent.ACTION_DOWN:
             
-            if (lockableScrollView != null)
-              lockableScrollView.setScrollingEnabled(false);
-            
-            for (int i = 0; i < data.size(); i++) {
-              if ((data.get(i).getStartAngleRadian() < touchAngle &&
-                       data.get(i).getSweepAngleRadian() > touchAngle) ||
-                      (data.get(i).getStartAngleRadian() < touchAngle + 2 * Math.PI &&
-                           data.get(i).getSweepAngleRadian() > touchAngle + 2 * Math.PI))
+            // Find out that on which segment of PieChartView touch point is.
+            for (int i = 0; i < pieChartData.size(); i++) {
+              if ((pieChartData.get(i).getStartAngleRadian() < touchAngle &&
+                       pieChartData.get(i).getSweepAngleRadian() > touchAngle) ||
+                      (pieChartData.get(i).getStartAngleRadian() < touchAngle + 2 * Math.PI &&
+                           pieChartData.get(i).getSweepAngleRadian() > touchAngle + 2 * Math.PI))
               {
                 setSelectedSegment(i);
               }
             }
             break;
           case MotionEvent.ACTION_MOVE:
+  
+            // If a LockableScrollView is defined, make it locked when PieChartView is touched.
             if (lockableScrollView != null)
               lockableScrollView.setScrollingEnabled(false);
-            for (int i = 0; i < data.size(); i++) {
-            if ((data.get(i).getStartAngleRadian() < touchAngle &&
-                     data.get(i).getSweepAngleRadian() > touchAngle) ||
-                    (data.get(i).getStartAngleRadian() < touchAngle + 2 * Math.PI &&
-                         data.get(i).getSweepAngleRadian() > touchAngle + 2 * Math.PI))
+  
+            // Find out that on which segment of PieChartView touch point is.
+            for (int i = 0; i < pieChartData.size(); i++) {
+            if ((pieChartData.get(i).getStartAngleRadian() < touchAngle &&
+                     pieChartData.get(i).getSweepAngleRadian() > touchAngle) ||
+                    (pieChartData.get(i).getStartAngleRadian() < touchAngle + 2 * Math.PI &&
+                         pieChartData.get(i).getSweepAngleRadian() > touchAngle + 2 * Math.PI))
             {
               setSelectedSegment(i);
             }
@@ -142,12 +158,15 @@ public class PieChartView extends View {
         
             break;
           case MotionEvent.ACTION_UP:
+            
+            // If user stops touching to PieChartView unlock LockableScrollView.
             if (lockableScrollView != null)
               lockableScrollView.setScrollingEnabled(true);
         }
         return true;
       }
     };
+    
     setOnTouchListener(onTouchListener);
   }
   
@@ -200,50 +219,62 @@ public class PieChartView extends View {
     super.onSizeChanged(w, h, oldw, oldh);
     setMeasuredDimension(w, h);
     
+    // Calculate the center point.
     xCenter = (w / 2) + getPaddingLeft() - getPaddingRight();
     yCenter = (h / 2) + getPaddingTop() - getPaddingBottom();
   
+    // Apply padding
     float topToCenter = yCenter - getPaddingTop();
     float rightToCenter = w - xCenter - getPaddingRight();
     float bottomToCenter = h - yCenter - getPaddingBottom();
     float leftToCenter = xCenter - getPaddingLeft();
     
+    // Determine the length of the radius of the chart. Find out the shortest distance between
+    // center and edges. And define it as the radius.
     radius = Math.min(Math.min(topToCenter, rightToCenter), Math.min(bottomToCenter, leftToCenter));
   
-    // Dimension of unselected circle segments' rect
+    // Dimension of unselected circle segments' rect.
     unselectedArcRect.left = xCenter - radius + apartDistance;
     unselectedArcRect.top = yCenter - radius + apartDistance;
     unselectedArcRect.right = xCenter + radius - apartDistance;
     unselectedArcRect.bottom = yCenter + radius - apartDistance;
     
-    if (data != null) {
-      if (data.size() > 0) {
+    // Calculate the data of PieChartView.
+    if (pieChartData != null) {
+      if (pieChartData.size() > 0) {
         double sum = 0;
         
-        for (PieChartData value : data) {
-          sum += value.getValue();
+        // Add all values to sum.
+        for (PieChartData data : pieChartData) {
+          sum += data.getValue();
         }
         
         double devisor360 = sum / 360;
         double devisor100 = sum / 100;
         
-        for (int i = 0; i < data.size(); i++) {
+        for (int i = 0; i < pieChartData.size(); i++) {
+          
+          /**
+           * @param middleAngleRadian is the angle which is on the middle of the start angle and sweep angle.
+           * It is used to trim the selected segment of the chart.
+           **/
+          
           startAngle = startAngle % 360;
-          double degree = data.get(i).getValue() / devisor360;
+          double degree = pieChartData.get(i).getValue() / devisor360;
           float drawingDegree = (float) degree;
-          double percentage = data.get(i).getValue() / devisor100;
+          double percentage = pieChartData.get(i).getValue() / devisor100;
           double startAngleRadian = Calc.degreeToRadian(startAngle);
           double middleAngleRadian = Calc.degreeToRadian(startAngle + degree / 2);
           double sweepAngleRadian = Calc.degreeToRadian(startAngle + degree);
   
-          data.get(i).setStartAngle(startAngle);
-          data.get(i).setStartAngleRadian(startAngleRadian);
-          data.get(i).setDegree(degree);
-          data.get(i).setPercentage(percentage);
-          data.get(i).setDrawingDegree(drawingDegree);
-          data.get(i).setMiddleAngleRadian(middleAngleRadian);
-          data.get(i).setSweepAngleRadian(sweepAngleRadian);
-          data.get(i).setColor(colorList[i]);
+          pieChartData.get(i).setStartAngle(startAngle);
+          pieChartData.get(i).setStartAngleRadian(startAngleRadian);
+          pieChartData.get(i).setDegree(degree);
+          pieChartData.get(i).setPercentage(percentage);
+          pieChartData.get(i).setDrawingDegree(drawingDegree);
+          pieChartData.get(i).setMiddleAngleRadian(middleAngleRadian);
+          pieChartData.get(i).setSweepAngleRadian(sweepAngleRadian);
+          pieChartData.get(i).setColor(colorList[i]);
           startAngle += degree;
         }
       }
@@ -252,21 +283,21 @@ public class PieChartView extends View {
   
   @Override
   protected void onDraw(Canvas canvas) {
-    if (data != null) {
-      if (data.size() > 0) {
+    if (pieChartData != null) {
+      if (pieChartData.size() > 0) {
+        
+        // Set text color and size.
         paintText.setColor(percentageTextColor);
         paintText.setTextSize(percentageTextSize);
         
+        // Set the color of the circle in the center.
         paintCenterCircle.setColor(centerCircleColor);
         
-        // Set the selected circle segment's color
-        if (data.get(selectedSegment).getColor() == 0)
-          paintSegment.setColor(colorList[selectedSegment]);
-        else
-          paintSegment.setColor(data.get(selectedSegment).getColor());
+        // Set the selected circle segment's color.
+        paintSegment.setColor(pieChartData.get(selectedSegment).getColor());
         
-        // Draw selected circle segment
-        double middleAng = data.get(selectedSegment).getMiddleAngleRadian();
+        // Set the borders of the selected circle segment.
+        double middleAng = pieChartData.get(selectedSegment).getMiddleAngleRadian();
         selectedArcRect.left = xCenter - radius + (apartDistance - animatedApartDistance) +
                                    (float) Math.cos(middleAng) * animatedApartDistance;
         selectedArcRect.right = xCenter + radius - (apartDistance - animatedApartDistance) +
@@ -276,32 +307,27 @@ public class PieChartView extends View {
         selectedArcRect.bottom = yCenter + radius - (apartDistance - animatedApartDistance) +
                                      (float) Math.sin(middleAng) * animatedApartDistance;
   
-        canvas.drawArc(selectedArcRect, data.get(selectedSegment).getStartAngle(),
-            data.get(selectedSegment).getDrawingDegree(),
+        // Draw selected circle segment.
+        canvas.drawArc(selectedArcRect, pieChartData.get(selectedSegment).getStartAngle(),
+            pieChartData.get(selectedSegment).getDrawingDegree(),
             true, paintSegment);
   
+        // Change paint color.
         paintSegment.setColor(centerCircleColor);
         
-        // Trim selected circle segment
+        // Trim selected circle segment.
         canvas.drawCircle(xCenter + (float) Math.cos(middleAng) * animatedApartDistance,
             yCenter + (float) Math.sin(middleAng) * animatedApartDistance, radius / 2,
             paintCenterCircle);
         
         // Draw other circle segments
-        for (int i = 0; i < data.size(); i++) {
-          
+        for (int i = 0; i < pieChartData.size(); i++) {
           // Set the circle segment's color
-          if (data.get(i).getColor() == 0) {
-            paintSegment.setColor(colorList[i]);
-            paintSegment.setColor(colorList[i]);
-          } else {
-            paintSegment.setColor(data.get(i).getColor());
-            paintSegment.setColor(data.get(i).getColor());
-          }
+          paintSegment.setColor(pieChartData.get(i).getColor());
           
           // Draw a circle segment
           if (i != selectedSegment) {
-            canvas.drawArc(unselectedArcRect, data.get(i).getStartAngle(), data.get(i).getDrawingDegree(),
+            canvas.drawArc(unselectedArcRect, pieChartData.get(i).getStartAngle(), pieChartData.get(i).getDrawingDegree(),
                 true, paintSegment);
           }
         }
@@ -310,7 +336,7 @@ public class PieChartView extends View {
         canvas.drawCircle(xCenter, yCenter, radius / 2, paintCenterCircle);
         
         // Draw percentage text
-        canvas.drawText(Calc.round(data.get(selectedSegment).getPercentage(), 1) + "%",
+        canvas.drawText(Calc.round(pieChartData.get(selectedSegment).getPercentage(), 1) + "%",
             xCenter, yCenter + percentageTextSize / 3, paintText);
       }
     }
@@ -331,6 +357,7 @@ public class PieChartView extends View {
       float apartDistanceDp = typedArray.getDimension(R.styleable.PieChartView_apartDistance,
           Calc.pxToDp(context, apartDistance));
       apartDistance = Calc.dpToPx(context, apartDistanceDp);
+      animatedApartDistance = apartDistance;
       
       startAngle = typedArray.getInt(R.styleable.PieChartView_startAngle, (int) startAngle);
       
@@ -358,18 +385,18 @@ public class PieChartView extends View {
   }
   
   
-  public ArrayList<PieChartData> getData() {
-    return data;
+  public ArrayList<PieChartData> getPieChartData() {
+    return pieChartData;
   }
   
-  public PieChartView setData(ArrayList<PieChartData> data) {
-    this.data = data;
+  public PieChartView setPieChartData(ArrayList<PieChartData> pieChartData) {
+    this.pieChartData = pieChartData;
     if (dataListener != null)
-      dataListener.onChange(data);
+      dataListener.onChange(pieChartData);
   
-    // If data list size bigger than color list size, add random color to color list.
-    if (data.size() > colorList.length) {
-      int difference = data.size() - colorList.length;
+    // If pieChartData list size bigger than color list size, add random color to color list.
+    if (pieChartData.size() > colorList.length) {
+      int difference = pieChartData.size() - colorList.length;
       ArrayList<Integer> colorAL = new ArrayList<>();
       
       // Take all color from colorList to a new ArrayList.
