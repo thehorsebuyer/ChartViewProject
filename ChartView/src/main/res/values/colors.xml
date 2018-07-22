@@ -9,6 +9,7 @@
     <color name="magenta">#ff00ff</color>
     <color name="pink">#ff69b4</color>
     <color name="cyan">#00ffff</color>
+    <color name="vanilla">#ffffa9</color>
     <color name="gray">#d3d3d3 </color>
     <color name="white">#ffffff </color>
     <color name="white_a50">#32ffffff</color>
@@ -25,7 +26,7 @@
         <item>@color/magenta</item>
         <item>@color/pink</item>
         <item>@color/cyan</item>
-        <item>@color/gray</item>
+        <item>@color/vanilla</item>
 
     </array>
 </resources>
