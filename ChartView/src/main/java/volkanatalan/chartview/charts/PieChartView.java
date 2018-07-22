@@ -18,6 +18,7 @@ import volkanatalan.chartview.R;
 import volkanatalan.chartview.datas.PieChartData;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class PieChartView extends View {
   
@@ -28,7 +29,7 @@ public class PieChartView extends View {
   private int selectedSegment = 0;
   private int oldSelectedSegment = selectedSegment;
   private int percentageTextSize = 30;
-  private int animationDuration = 500;
+  private int animationDuration = 300;
   private int percentageTextColor = Color.BLACK;
   private int centerCircleColor = Color.WHITE;
   private int[] colorList = getContext().getResources().getIntArray(R.array.pie_chart_color_list);
@@ -242,6 +243,7 @@ public class PieChartView extends View {
           data.get(i).setDrawingDegree(drawingDegree);
           data.get(i).setMiddleAngleRadian(middleAngleRadian);
           data.get(i).setSweepAngleRadian(sweepAngleRadian);
+          data.get(i).setColor(colorList[i]);
           startAngle += degree;
         }
       }
@@ -341,6 +343,20 @@ public class PieChartView extends View {
     }
   }
   
+  private int generateRandomColor() {
+    Random random = new Random();
+    int red = random.nextInt(255);
+    int green = random.nextInt(255);
+    int blue = random.nextInt(255);
+    int color = Color.rgb(red, green, blue);
+    
+    if (color != centerCircleColor) {
+      return color;
+    }else
+      // If generated color is the same with the centerCircleColor's, generate new color.
+      return generateRandomColor();
+  }
+  
   
   public ArrayList<PieChartData> getData() {
     return data;
@@ -350,6 +366,23 @@ public class PieChartView extends View {
     this.data = data;
     if (dataListener != null)
       dataListener.onChange(data);
+  
+    // If data list size bigger than color list size, add random color to color list.
+    if (data.size() > colorList.length) {
+      int difference = data.size() - colorList.length;
+      ArrayList<Integer> colorAL = new ArrayList<>();
+      
+      // Take all color from colorList to a new ArrayList.
+      for (int color : colorList) colorAL.add(color);
+      
+      // Generate new random colors and add them to new ArrayList.
+      for (int i = 0; i < difference; i++) colorAL.add(generateRandomColor());
+  
+      // Take all colors from new ArrayList to new colorList
+      colorList = new int[colorAL.size()];
+      for (int i = 0; i < colorAL.size(); i++) colorList[i] = colorAL.get(i);
+    }
+    
     invalidate();
     return this;
   }
