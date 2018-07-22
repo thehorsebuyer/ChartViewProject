@@ -46,5 +46,6 @@
         <attr name="distanceBetweenColorBoxAndText" />
         <attr name="colorBoxShape" />
         <attr name="colorBoxPosition" />
+        <attr name="animationDuration" />
     </declare-styleable>
 </resources>
