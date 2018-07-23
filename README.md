@@ -1,5 +1,5 @@
 # :star: ChartViewProject :star:
-![ChartViewProject](https://github.com/thehorsebuyer/ChartViewProject/blob/master/images/ChartViewProjectSS.png)
+![ChartViewProject](https://github.com/thehorsebuyer/ChartViewProject/blob/master/images/PieChartView_and_PieChartDataView.png)
 
 <br>
 ChartViewProject is an unfinished project which contains a pie chart for now. But in the future other chart types will be added. The charts in this project will be interactive, animated and good-looking. <br>
@@ -13,7 +13,7 @@ ChartViewProject is an unfinished project which contains a pie chart for now. Bu
 
 ### 1- PieChartView
 
-![PieChartView](https://github.com/thehorsebuyer/ChartViewProject/blob/master/images/PieChartView.jpg)
+![PieChartView](https://github.com/thehorsebuyer/ChartViewProject/blob/master/images/PieChartView.png)
 
 With this view you can add a pie chart to your project. PieChartView is interactable. When you touch a segment of the chart, the segment comes apart and the percentage of the segment is written on the center of the chart. PieChartView is customizable. You can define your own color set to it, you can change its starting angle and etc.
 
@@ -71,7 +71,7 @@ pieChartView.setData(pieChartData)
 
 ### 2- PieChartDataView
 
-![PieChartDataView](https://github.com/thehorsebuyer/ChartViewProject/blob/master/images/PieChartDataView.jpg)
+![PieChartDataView](https://github.com/thehorsebuyer/ChartViewProject/blob/master/images/PieChartDataView.png)
 
 With this view you can show the data of the PieChartView. It shows the color of the item, item name and item amount in the PieChartView. PieChartDataView is interactable. If you touch any segment of the PieChartView, required item of the PieChartDataView gets selected.In the same way, if you touch any item of the PieChartDataView, that item gets selected and required segment of the PieChartView comes apart. PieChartDataView is also customizable. You can change the selector color, set the color box shape as square, circle and triangle, and etc.
 
