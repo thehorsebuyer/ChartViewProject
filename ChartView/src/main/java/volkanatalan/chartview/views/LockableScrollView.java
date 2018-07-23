@@ -1,6 +1,6 @@
-package volkanatalan.chartview;
-
+package volkanatalan.chartview.views;
 // https://gist.github.com/chittaranjan-khuntia/42d5429ac37b7aea3cb22fb51c8729b4
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -63,6 +63,4 @@ public class LockableScrollView extends ScrollView {
     if (!mScrollable) return false;
     else return super.onInterceptTouchEvent(ev);
   }
-  
-  
 }

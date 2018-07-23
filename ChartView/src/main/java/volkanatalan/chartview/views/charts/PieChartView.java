@@ -1,4 +1,4 @@
-package volkanatalan.chartview.charts;
+package volkanatalan.chartview.views.charts;
 
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -12,10 +12,10 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import volkanatalan.chartview.Calc;
-import volkanatalan.chartview.LockableScrollView;
+import volkanatalan.chartview.models.Calc;
+import volkanatalan.chartview.views.LockableScrollView;
 import volkanatalan.chartview.R;
-import volkanatalan.chartview.datas.PieChartData;
+import volkanatalan.chartview.models.PieChartData;
 
 import java.util.ArrayList;
 import java.util.Random;

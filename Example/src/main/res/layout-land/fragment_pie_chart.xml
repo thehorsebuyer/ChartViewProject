@@ -15,7 +15,7 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <volkanatalan.chartview.charts.PieChartView
+        <volkanatalan.chartview.views.charts.PieChartView
             android:id="@+id/pieChartView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -23,9 +23,10 @@
             app:centerCircleColor="@color/spaceGray"
             app:percentageTextColor="@color/white"
             app:percentageTextSize="50sp"
-            app:apartDistance="10dp" />
+            app:apartDistance="10dp"
+            app:animationDuration="300" />
 
-        <volkanatalan.chartview.data_views.PieChartDataView
+        <volkanatalan.chartview.views.PieChartDataView
             android:id="@+id/pieChartDataView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -35,7 +36,8 @@
             app:colorBoxDimension="15dp"
             app:distanceBetweenColorBoxAndText="10dp"
             app:colorBoxShape="CIRCLE"
-            app:colorBoxPosition="LEFT" />
+            app:colorBoxPosition="LEFT"
+            app:animationDuration="300" />
 
     </LinearLayout>
 

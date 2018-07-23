@@ -1,4 +1,4 @@
-package volkanatalan.chartview;
+package volkanatalan.chartview.models;
 
 import android.content.Context;
 import android.content.res.Resources;

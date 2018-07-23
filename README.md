@@ -20,7 +20,7 @@ With this view you can add a pie chart to your project. PieChartView is interact
 ### Usage
 #### XML
 ```XML
-<volkanatalan.chartview.charts.PieChartView
+<volkanatalan.chartview.views.charts.PieChartView
     android:id="@+id/pieChartView"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" />
@@ -46,7 +46,7 @@ pieChartView.setData(pieChartData);
 **If you need more customization:**
 
 ```XML
-<volkanatalan.chartview.charts.PieChartView
+<volkanatalan.chartview.views.charts.PieChartView
     android:id="@+id/pieChartView"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -78,7 +78,7 @@ With this view you can show the data of the PieChartView. It shows the color of 
 ### Usage
 #### XML
 ```XML
-<volkanatalan.chartview.data_views.PieChartDataView
+<volkanatalan.chartview.views.PieChartDataView
     android:id="@+id/pieChartDataView"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" />
@@ -94,7 +94,7 @@ pieChartDataView.setData(pieChartData)
 **If you need more customization:**
 
 ```XML
-<volkanatalan.chartview.data_views.PieChartDataView
+<volkanatalan.chartview.views.PieChartDataView
     android:id="@+id/pieChartDataView"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -129,7 +129,7 @@ LockableScrollView is a ScrollView which lets you lock and unlock itself wheneve
 
 ### Usage
 ```XML
-<volkanatalan.chartview.LockableScrollView
+<volkanatalan.chartview.views.LockableScrollView
     android:id="@+id/lockableScrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -140,18 +140,18 @@ LockableScrollView is a ScrollView which lets you lock and unlock itself wheneve
         android:gravity="center"
         android:orientation="vertical">
 
-        <volkanatalan.chartview.charts.PieChartView
+        <volkanatalan.chartview.views.charts.PieChartView
             android:id="@+id/pieChartView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <volkanatalan.chartview.data_views.PieChartDataView
+        <volkanatalan.chartview.views.PieChartDataView
             android:id="@+id/pieChartDataView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
     </LinearLayout>
-</volkanatalan.chartview.LockableScrollView>
+</volkanatalan.chartview.views.LockableScrollView>
 ```
 
 ```Java

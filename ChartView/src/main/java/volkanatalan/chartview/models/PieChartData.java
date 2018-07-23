@@ -1,4 +1,4 @@
-package volkanatalan.chartview.datas;
+package volkanatalan.chartview.models;
 
 public class PieChartData {
   private String title;

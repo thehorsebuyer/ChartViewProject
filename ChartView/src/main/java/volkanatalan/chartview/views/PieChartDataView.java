@@ -1,4 +1,4 @@
-package volkanatalan.chartview.data_views;
+package volkanatalan.chartview.views;
 
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -18,10 +18,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import volkanatalan.chartview.Calc;
+import volkanatalan.chartview.models.Calc;
 import volkanatalan.chartview.R;
-import volkanatalan.chartview.charts.PieChartView;
-import volkanatalan.chartview.datas.PieChartData;
+import volkanatalan.chartview.views.charts.PieChartView;
+import volkanatalan.chartview.models.PieChartData;
 
 import java.util.ArrayList;
 

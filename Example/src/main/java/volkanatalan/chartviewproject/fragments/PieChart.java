@@ -9,9 +9,9 @@ import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 
-import volkanatalan.chartview.charts.PieChartView;
-import volkanatalan.chartview.data_views.PieChartDataView;
-import volkanatalan.chartview.datas.PieChartData;
+import volkanatalan.chartview.views.charts.PieChartView;
+import volkanatalan.chartview.views.PieChartDataView;
+import volkanatalan.chartview.models.PieChartData;
 import volkanatalan.chartviewproject.R;
 
 public class PieChart extends Fragment {
